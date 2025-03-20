@@ -7,8 +7,10 @@ import {
     type ChatModelAdapter,
 } from "@assistant-ui/react";
 
-// The FastAPI backend endpoint URL
-const BACKEND_API_URL = "http://localhost:8000/chat/property/default/message";
+// Get API base URL from environment variables
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Construct the full endpoint URL
+const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
 
 // Helper function to extract text content from any message format
 const extractTextContent = (content: any): string => {
