@@ -6,6 +6,7 @@ import {
   ThreadPrimitive,
 } from "@assistant-ui/react";
 import type { FC } from "react";
+import { useState, createContext, useContext } from "react";
 import {
   ArrowDownIcon,
   CheckIcon,
@@ -16,6 +17,7 @@ import {
   RefreshCwIcon,
   SendHorizontalIcon,
   BookOpenIcon,
+  XIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,35 +25,77 @@ import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 
+// Create a context for the sources panel
+interface SourcesPanelContextType {
+  showSourcesPanel: boolean;
+  setShowSourcesPanel: (show: boolean) => void;
+}
+
+const SourcesPanelContext = createContext<SourcesPanelContextType | undefined>(undefined);
+
+// Hook to use the sources panel context
+const useSourcesPanel = () => {
+  const context = useContext(SourcesPanelContext);
+  if (context === undefined) {
+    throw new Error('useSourcesPanel must be used within a SourcesPanelProvider');
+  }
+  return context;
+};
+
 export const Thread: FC = () => {
+  const [showSourcesPanel, setShowSourcesPanel] = useState(false);
+
   return (
-    <ThreadPrimitive.Root
-      className="bg-background box-border h-full flex flex-col overflow-hidden"
-      style={{
-        ["--thread-max-width" as string]: "42rem",
-      }}
-    >
-      <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
-        <ThreadWelcome />
-
-        <ThreadPrimitive.Messages
-          components={{
-            UserMessage: UserMessage,
-            EditComposer: EditComposer,
-            AssistantMessage: AssistantMessage,
+    <SourcesPanelContext.Provider value={{ showSourcesPanel, setShowSourcesPanel }}>
+      <div className="h-full flex">
+        <ThreadPrimitive.Root
+          className="bg-background box-border h-full flex flex-col overflow-hidden flex-grow"
+          style={{
+            ["--thread-max-width" as string]: "42rem",
           }}
-        />
+        >
+          <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
+            <ThreadWelcome />
 
-        <ThreadPrimitive.If empty={false}>
-          <div className="min-h-8 flex-grow" />
-        </ThreadPrimitive.If>
+            <ThreadPrimitive.Messages
+              components={{
+                UserMessage: UserMessage,
+                EditComposer: EditComposer,
+                AssistantMessage: AssistantMessage,
+              }}
+            />
 
-        <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
-          <ThreadScrollToBottom />
-          <Composer />
-        </div>
-      </ThreadPrimitive.Viewport>
-    </ThreadPrimitive.Root>
+            <ThreadPrimitive.If empty={false}>
+              <div className="min-h-8 flex-grow" />
+            </ThreadPrimitive.If>
+
+            <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
+              <ThreadScrollToBottom />
+              <Composer />
+            </div>
+          </ThreadPrimitive.Viewport>
+        </ThreadPrimitive.Root>
+
+        {/* Sources Panel */}
+        {showSourcesPanel && (
+          <div className="h-full border-l w-72 p-4 bg-white overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Sources</h2>
+              <TooltipIconButton
+                tooltip="Close"
+                onClick={() => setShowSourcesPanel(false)}
+              >
+                <XIcon size={18} />
+              </TooltipIconButton>
+            </div>
+            <div className="text-sm text-gray-600">
+              {/* Sources content will go here */}
+              No sources available for this message.
+            </div>
+          </div>
+        )}
+      </div>
+    </SourcesPanelContext.Provider>
   );
 };
 
@@ -214,6 +258,8 @@ const AssistantMessage: FC = () => {
 };
 
 const AssistantActionBar: FC = () => {
+  const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
+
   return (
     <ActionBarPrimitive.Root
       hideWhenRunning
@@ -238,8 +284,9 @@ const AssistantActionBar: FC = () => {
 
       {/* Sources button */}
       <TooltipIconButton
-        tooltip="Sources"
-        onClick={() => alert("Sources for this message")}
+        tooltip={showSourcesPanel ? "Hide sources" : "Show sources"}
+        onClick={() => setShowSourcesPanel(!showSourcesPanel)}
+        className={showSourcesPanel ? "text-primary" : ""}
       >
         <BookOpenIcon />
       </TooltipIconButton>
