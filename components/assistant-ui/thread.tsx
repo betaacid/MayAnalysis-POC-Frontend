@@ -26,6 +26,8 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 import { SourcesPanel, useSourcesPanel } from "@/components/assistant-ui/sources-panel";
 import { Switch } from "@/components/ui/switch";
 import { useWebSearch } from "@/components/assistant-ui/web-search-context";
+import { KnowledgeSourcesSelector } from "@/components/assistant-ui/knowledge-sources-selector";
+import { useKnowledgeSources } from "@/components/assistant-ui/knowledge-sources-context";
 
 export const Thread: FC = () => {
   return (
@@ -120,11 +122,28 @@ const ThreadWelcomeSuggestions: FC = () => {
 
 const Composer: FC = () => {
   const { includeWebSearch, setIncludeWebSearch } = useWebSearch();
+  const { selectedSources } = useKnowledgeSources();
+
+  // Prepare knowledge sources for API request
+  const getKnowledgeSourcesForRequest = () => {
+    // If "all" is included, just return ["all"]
+    if (selectedSources.includes("all")) {
+      return ["all"];
+    }
+    // Otherwise return the selected sources
+    return selectedSources;
+  };
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="flex items-center justify-end gap-2 px-3">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="flex flex-col gap-2 px-3">
+        {/* Knowledge Sources Selector */}
+        <div className="w-full">
+          <KnowledgeSourcesSelector />
+        </div>
+
+        {/* Web Search Toggle */}
+        <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
           <Switch
             id="web-search"
             checked={includeWebSearch}
@@ -144,6 +163,8 @@ const Composer: FC = () => {
           autoFocus
           placeholder="Write a message..."
           className="placeholder:text-muted-foreground max-h-40 flex-grow resize-none border-none bg-transparent px-2 py-4 text-sm outline-none focus:ring-0 disabled:cursor-not-allowed"
+          // Add data attribute to carry knowledge sources to the API handler
+          data-knowledge-sources={JSON.stringify(getKnowledgeSourcesForRequest())}
         />
         <ComposerAction />
       </ComposerPrimitive.Root>

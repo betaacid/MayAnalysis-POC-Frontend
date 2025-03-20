@@ -8,6 +8,7 @@ import {
 } from "@assistant-ui/react";
 import { extractTextContent } from "@/lib/types/message";
 import { useWebSearch } from "@/components/assistant-ui/web-search-context";
+import { useKnowledgeSources } from "@/components/assistant-ui/knowledge-sources-context";
 
 // Get API base URL from environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -17,6 +18,7 @@ const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
 // Create a custom runtime adapter that integrates with our sources panel
 export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const { includeWebSearch } = useWebSearch();
+    const { selectedSources } = useKnowledgeSources();
 
     const myModelAdapter: ChatModelAdapter = {
         async run({ messages, abortSignal }) {
@@ -37,6 +39,11 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 is_user: msg.role === "user"
             }));
 
+            // Prepare knowledge sources for the request
+            const knowledgeSources = selectedSources.includes("all")
+                ? ["all"]
+                : [...selectedSources];
+
             // Call the actual backend endpoint
             const result = await fetch(BACKEND_API_URL, {
                 method: "POST",
@@ -49,7 +56,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                     history: history,
                     // Minimal required fields for the backend
                     chat_model: "openai:gpt-4o",
-                    knowledge_sources: ["all"],
+                    knowledge_sources: knowledgeSources,
                     // Use the web search toggle state (inverted since we control include but API expects exclude)
                     exclude_web: !includeWebSearch,
                 }),

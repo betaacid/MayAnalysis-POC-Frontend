@@ -4,6 +4,7 @@ import "./globals.css";
 import { MyRuntimeProvider } from "./MyRuntimeProvider";
 import { SourcesPanelWrapper } from "./SourcesPanelWrapper";
 import { WebSearchProvider } from "@/components/assistant-ui/web-search-context";
+import { KnowledgeSourcesProvider } from "@/components/assistant-ui/knowledge-sources-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,11 +33,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <WebSearchProvider>
-          <SourcesPanelWrapper>
-            <MyRuntimeProvider>
-              {children}
-            </MyRuntimeProvider>
-          </SourcesPanelWrapper>
+          <KnowledgeSourcesProvider>
+            <SourcesPanelWrapper>
+              <MyRuntimeProvider>
+                {children}
+              </MyRuntimeProvider>
+            </SourcesPanelWrapper>
+          </KnowledgeSourcesProvider>
         </WebSearchProvider>
       </body>
     </html>
