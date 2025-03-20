@@ -136,27 +136,6 @@ const Composer: FC = () => {
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="flex flex-col gap-2 px-3">
-        {/* Knowledge Sources Selector */}
-        <div className="w-full">
-          <KnowledgeSourcesSelector />
-        </div>
-
-        {/* Web Search Toggle */}
-        <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
-          <Switch
-            id="web-search"
-            checked={includeWebSearch}
-            onCheckedChange={setIncludeWebSearch}
-            className="scale-75"
-          />
-          <div className="flex items-center gap-1 cursor-pointer" onClick={() => setIncludeWebSearch(!includeWebSearch)}>
-            <Globe size={14} />
-            Include web search
-          </div>
-        </div>
-      </div>
-
       <ComposerPrimitive.Root className="focus-within:border-ring/20 flex w-full flex-wrap items-end rounded-lg border bg-inherit px-2.5 shadow-sm transition-colors ease-in">
         <ComposerPrimitive.Input
           rows={1}
@@ -168,6 +147,31 @@ const Composer: FC = () => {
         />
         <ComposerAction />
       </ComposerPrimitive.Root>
+
+      {/* Simple visual separator */}
+      <div className="h-px w-full bg-border opacity-40 my-3"></div>
+
+      {/* Controls Row - Web Search and Knowledge Sources */}
+      <div className="flex items-center justify-between gap-2 px-2 py-2 rounded-lg bg-muted/20">
+        {/* Web Search Toggle - Left Side */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground ml-1">
+          <Switch
+            id="web-search"
+            checked={includeWebSearch}
+            onCheckedChange={setIncludeWebSearch}
+            className="scale-75"
+          />
+          <div className="flex items-center gap-1 cursor-pointer" onClick={() => setIncludeWebSearch(!includeWebSearch)}>
+            <Globe size={14} />
+            Include web search
+          </div>
+        </div>
+
+        {/* Knowledge Sources Selector - Right Side */}
+        <div className="w-[60%] max-w-md">
+          <KnowledgeSourcesSelector />
+        </div>
+      </div>
     </div>
   );
 };
