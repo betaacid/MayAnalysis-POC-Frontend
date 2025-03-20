@@ -47,7 +47,7 @@ export const Thread: FC = () => {
 
   return (
     <SourcesPanelContext.Provider value={{ showSourcesPanel, setShowSourcesPanel }}>
-      <div className="h-full flex">
+      <div className="h-full flex relative">
         <ThreadPrimitive.Root
           className="bg-background box-border h-full flex flex-col overflow-hidden flex-grow"
           style={{
@@ -78,8 +78,8 @@ export const Thread: FC = () => {
 
         {/* Sources Panel */}
         {showSourcesPanel && (
-          <div className="h-full border-l w-72 p-4 bg-white overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
+          <div className="fixed right-0 top-0 bottom-0 w-72 border-l bg-white shadow-md z-10 flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">Sources</h2>
               <TooltipIconButton
                 tooltip="Close"
@@ -88,9 +88,11 @@ export const Thread: FC = () => {
                 <XIcon size={18} />
               </TooltipIconButton>
             </div>
-            <div className="text-sm text-gray-600">
-              {/* Sources content will go here */}
-              No sources available for this message.
+            <div className="p-4 overflow-y-auto flex-grow">
+              <div className="text-sm text-gray-600">
+                {/* Sources content will go here */}
+                No sources available for this message.
+              </div>
             </div>
           </div>
         )}
