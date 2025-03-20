@@ -6,43 +6,12 @@ import {
     useLocalRuntime,
     type ChatModelAdapter,
 } from "@assistant-ui/react";
+import { extractTextContent } from "@/lib/types/message";
 
 // Get API base URL from environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 // Construct the full endpoint URL
 const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
-
-// Helper function to extract text content from any message format
-const extractTextContent = (content: any): string => {
-    try {
-        // If it's a string, return it directly
-        if (typeof content === "string") {
-            return content;
-        }
-
-        // If it's an array, look for the first text part
-        if (Array.isArray(content)) {
-            for (const part of content) {
-                if (part && typeof part === "object" && part.type === "text" && typeof part.text === "string") {
-                    return part.text;
-                }
-            }
-        }
-
-        // If it's an object with text, return that
-        if (content && typeof content === "object") {
-            if (content.type === "text" && typeof content.text === "string") {
-                return content.text;
-            }
-        }
-
-        // Default: stringify the content
-        return JSON.stringify(content);
-    } catch (e) {
-        console.error("Error extracting text content:", e);
-        return String(content);
-    }
-};
 
 const MyModelAdapter: ChatModelAdapter = {
     async run({ messages, abortSignal }) {
