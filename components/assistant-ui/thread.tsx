@@ -15,6 +15,7 @@ import {
   PencilIcon,
   RefreshCwIcon,
   SendHorizontalIcon,
+  BookOpenIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -234,6 +235,15 @@ const AssistantActionBar: FC = () => {
           </TooltipIconButton>
         </ActionBarPrimitive.StopSpeaking>
       </MessagePrimitive.If> */}
+
+      {/* Sources button */}
+      <TooltipIconButton
+        tooltip="Sources"
+        onClick={() => alert("Sources for this message")}
+      >
+        <BookOpenIcon />
+      </TooltipIconButton>
+
       <ActionBarPrimitive.Copy asChild>
         <TooltipIconButton tooltip="Copy">
           <MessagePrimitive.If copied>
