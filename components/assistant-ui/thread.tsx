@@ -6,7 +6,6 @@ import {
   ThreadPrimitive,
 } from "@assistant-ui/react";
 import type { FC } from "react";
-import { useState } from "react";
 import {
   ArrowDownIcon,
   CheckIcon,
@@ -17,52 +16,51 @@ import {
   RefreshCwIcon,
   SendHorizontalIcon,
   BookOpenIcon,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
-import { SourcesPanel, SourcesPanelProvider, useSourcesPanel } from "@/components/assistant-ui/sources-panel";
+import { SourcesPanel, useSourcesPanel } from "@/components/assistant-ui/sources-panel";
+import { Switch } from "@/components/ui/switch";
+import { useWebSearch } from "@/components/assistant-ui/web-search-context";
 
 export const Thread: FC = () => {
-  const [showSourcesPanel, setShowSourcesPanel] = useState(false);
-
   return (
-    <SourcesPanelProvider value={{ showSourcesPanel, setShowSourcesPanel }}>
-      <div className="h-full flex relative w-full overflow-x-hidden">
-        <ThreadPrimitive.Root
-          className="bg-background box-border h-full flex flex-col overflow-hidden w-full"
-          style={{
-            ["--thread-max-width" as string]: "42rem",
-          }}
-        >
-          <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
-            <ThreadWelcome />
+    <div className="h-full flex relative w-full overflow-x-hidden">
+      <ThreadPrimitive.Root
+        className="bg-background box-border h-full flex flex-col overflow-hidden w-full"
+        style={{
+          ["--thread-max-width" as string]: "42rem",
+        }}
+      >
+        <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
+          <ThreadWelcome />
 
-            <ThreadPrimitive.Messages
-              components={{
-                UserMessage: UserMessage,
-                EditComposer: EditComposer,
-                AssistantMessage: AssistantMessage,
-              }}
-            />
+          <ThreadPrimitive.Messages
+            components={{
+              UserMessage: UserMessage,
+              EditComposer: EditComposer,
+              AssistantMessage: AssistantMessage,
+            }}
+          />
 
-            <ThreadPrimitive.If empty={false}>
-              <div className="min-h-8 flex-grow" />
-            </ThreadPrimitive.If>
+          <ThreadPrimitive.If empty={false}>
+            <div className="min-h-8 flex-grow" />
+          </ThreadPrimitive.If>
 
-            <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
-              <ThreadScrollToBottom />
-              <Composer />
-            </div>
-          </ThreadPrimitive.Viewport>
-        </ThreadPrimitive.Root>
+          <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
+            <ThreadScrollToBottom />
+            <Composer />
+          </div>
+        </ThreadPrimitive.Viewport>
+      </ThreadPrimitive.Root>
 
-        {/* Sources Panel Component */}
-        <SourcesPanel />
-      </div>
-    </SourcesPanelProvider>
+      {/* Sources Panel Component */}
+      <SourcesPanel />
+    </div>
   );
 };
 
@@ -121,16 +119,35 @@ const ThreadWelcomeSuggestions: FC = () => {
 };
 
 const Composer: FC = () => {
+  const { includeWebSearch, setIncludeWebSearch } = useWebSearch();
+
   return (
-    <ComposerPrimitive.Root className="focus-within:border-ring/20 flex w-full flex-wrap items-end rounded-lg border bg-inherit px-2.5 shadow-sm transition-colors ease-in">
-      <ComposerPrimitive.Input
-        rows={1}
-        autoFocus
-        placeholder="Write a message..."
-        className="placeholder:text-muted-foreground max-h-40 flex-grow resize-none border-none bg-transparent px-2 py-4 text-sm outline-none focus:ring-0 disabled:cursor-not-allowed"
-      />
-      <ComposerAction />
-    </ComposerPrimitive.Root>
+    <div className="w-full flex flex-col gap-2">
+      <div className="flex items-center justify-end gap-2 px-3">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Switch
+            id="web-search"
+            checked={includeWebSearch}
+            onCheckedChange={setIncludeWebSearch}
+            className="scale-75"
+          />
+          <div className="flex items-center gap-1 cursor-pointer" onClick={() => setIncludeWebSearch(!includeWebSearch)}>
+            <Globe size={14} />
+            Include web search
+          </div>
+        </div>
+      </div>
+
+      <ComposerPrimitive.Root className="focus-within:border-ring/20 flex w-full flex-wrap items-end rounded-lg border bg-inherit px-2.5 shadow-sm transition-colors ease-in">
+        <ComposerPrimitive.Input
+          rows={1}
+          autoFocus
+          placeholder="Write a message..."
+          className="placeholder:text-muted-foreground max-h-40 flex-grow resize-none border-none bg-transparent px-2 py-4 text-sm outline-none focus:ring-0 disabled:cursor-not-allowed"
+        />
+        <ComposerAction />
+      </ComposerPrimitive.Root>
+    </div>
   );
 };
 
