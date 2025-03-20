@@ -6,7 +6,7 @@ import {
   ThreadPrimitive,
 } from "@assistant-ui/react";
 import type { FC } from "react";
-import { useState, createContext, useContext } from "react";
+import { useState } from "react";
 import {
   ArrowDownIcon,
   CheckIcon,
@@ -17,39 +17,22 @@ import {
   RefreshCwIcon,
   SendHorizontalIcon,
   BookOpenIcon,
-  XIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
-
-// Create a context for the sources panel
-interface SourcesPanelContextType {
-  showSourcesPanel: boolean;
-  setShowSourcesPanel: (show: boolean) => void;
-}
-
-const SourcesPanelContext = createContext<SourcesPanelContextType | undefined>(undefined);
-
-// Hook to use the sources panel context
-const useSourcesPanel = () => {
-  const context = useContext(SourcesPanelContext);
-  if (context === undefined) {
-    throw new Error('useSourcesPanel must be used within a SourcesPanelProvider');
-  }
-  return context;
-};
+import { SourcesPanel, SourcesPanelProvider, useSourcesPanel } from "@/components/assistant-ui/sources-panel";
 
 export const Thread: FC = () => {
   const [showSourcesPanel, setShowSourcesPanel] = useState(false);
 
   return (
-    <SourcesPanelContext.Provider value={{ showSourcesPanel, setShowSourcesPanel }}>
-      <div className="h-full flex relative">
+    <SourcesPanelProvider value={{ showSourcesPanel, setShowSourcesPanel }}>
+      <div className="h-full flex relative w-full overflow-x-hidden">
         <ThreadPrimitive.Root
-          className="bg-background box-border h-full flex flex-col overflow-hidden flex-grow"
+          className="bg-background box-border h-full flex flex-col overflow-hidden w-full"
           style={{
             ["--thread-max-width" as string]: "42rem",
           }}
@@ -76,28 +59,10 @@ export const Thread: FC = () => {
           </ThreadPrimitive.Viewport>
         </ThreadPrimitive.Root>
 
-        {/* Sources Panel */}
-        {showSourcesPanel && (
-          <div className="fixed right-0 top-0 bottom-0 w-72 border-l bg-white shadow-md z-10 flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold">Sources</h2>
-              <TooltipIconButton
-                tooltip="Close"
-                onClick={() => setShowSourcesPanel(false)}
-              >
-                <XIcon size={18} />
-              </TooltipIconButton>
-            </div>
-            <div className="p-4 overflow-y-auto flex-grow">
-              <div className="text-sm text-gray-600">
-                {/* Sources content will go here */}
-                No sources available for this message.
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Sources Panel Component */}
+        <SourcesPanel />
       </div>
-    </SourcesPanelContext.Provider>
+    </SourcesPanelProvider>
   );
 };
 
