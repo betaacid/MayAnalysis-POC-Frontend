@@ -13,9 +13,9 @@ export const ModelConfig: React.FC = () => {
 
     // Default values based on the chat.py implementation
     const defaultChatSystemPrompt = "You are a helpful AI assistant answering questions about real estate properties.";
-    const defaultSelectionSystemPrompt = "You are a helpful AI assistant that selects relevant information for a query.";
-    const defaultSearchSystemPrompt = "You are a helpful AI assistant that constructs effective search queries.";
-    const defaultRefinementSystemPrompt = "You are a helpful AI assistant that refines information for a clear and concise response.";
+    const defaultSelectionSystemPrompt = "You are a helpful AI assistant that determines which knowledge sources are most relevant for answering a query.";
+    const defaultSearchSystemPrompt = "You are a helpful AI assistant that performs web searches to find relevant information.";
+    const defaultRefinementSystemPrompt = "You are a helpful AI assistant that reformulates user queries into effective search queries.";
 
     return (
         <div className="flex flex-col space-y-2 w-full px-4 overflow-y-auto">
@@ -40,7 +40,7 @@ export const ModelConfig: React.FC = () => {
                     <AccordionContent className="px-1">
                         <LLMConfig
                             title=""
-                            explanation="Used to select relevant information from knowledge sources."
+                            explanation="Determines which knowledge sources to use when 'All sources' is selected."
                             defaultModel="gpt-3.5-turbo"
                             defaultSystemPrompt={defaultSelectionSystemPrompt}
                             models={models}
@@ -53,7 +53,7 @@ export const ModelConfig: React.FC = () => {
                     <AccordionContent className="px-1">
                         <LLMConfig
                             title=""
-                            explanation="Used to formulate effective search queries."
+                            explanation="Used for performing web searches to find relevant information online."
                             defaultModel="gpt-3.5-turbo"
                             defaultSystemPrompt={defaultSearchSystemPrompt}
                             models={models}
@@ -66,7 +66,7 @@ export const ModelConfig: React.FC = () => {
                     <AccordionContent className="px-1">
                         <LLMConfig
                             title=""
-                            explanation="Used to refine and improve the final response."
+                            explanation="Helps transform user queries into effective search queries for the Search Model."
                             defaultModel="gpt-3.5-turbo"
                             defaultSystemPrompt={defaultRefinementSystemPrompt}
                             models={models}
