@@ -24,6 +24,17 @@ export const ModelConfig: React.FC = () => {
         { label: "Cerebras Llama 3.3 (70B)", value: "cerebras:llama-3.3-70b" }
     ];
 
+    // Limited model options for the Selection Model
+    const selectionModelOptions = [
+        // OpenAI models
+        { label: "OpenAI GPT-4o", value: "openai:gpt-4o" },
+        { label: "OpenAI GPT-4o Mini", value: "openai:gpt-4o-mini" },
+        { label: "OpenAI GPT-4 Turbo", value: "openai:gpt-4-turbo" },
+
+        // Only Llama 3 from Groq
+        { label: "Groq Llama 3 (70B)", value: "groq:llama3-70b-8192" }
+    ];
+
     // Default values taken directly from system_prompts.py, with added linebreaks for readability
     const defaultChatSystemPrompt = `You are an AI assistant for real estate investment analysis.
 
@@ -85,9 +96,9 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="Determines which knowledge sources to use when 'All sources' is selected."
-                            defaultModel="openai:gpt-4o-mini"
+                            defaultModel="groq:llama3-70b-8192"
                             defaultSystemPrompt={defaultSelectionSystemPrompt}
-                            modelOptions={modelOptions}
+                            modelOptions={selectionModelOptions}
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -111,7 +122,7 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="Helps transform user queries into effective search queries for the Search Model."
-                            defaultModel="openai:gpt-4-turbo"
+                            defaultModel="cerebras:llama-3.3-70b"
                             defaultSystemPrompt={defaultRefinementSystemPrompt}
                             modelOptions={modelOptions}
                         />
