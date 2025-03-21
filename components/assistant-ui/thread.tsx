@@ -144,7 +144,7 @@ const Composer: FC = () => {
         <ComposerPrimitive.Input
           rows={1}
           autoFocus
-          placeholder="Write a message..."
+          placeholder="Ask anything about Oakwood Apartments..."
           className="placeholder:text-muted-foreground max-h-40 flex-grow resize-none border-none bg-transparent px-2 py-4 text-sm outline-none focus:ring-0 disabled:cursor-not-allowed"
           // Add data attribute to carry knowledge sources to the API handler
           data-knowledge-sources={JSON.stringify(getKnowledgeSourcesForRequest())}
