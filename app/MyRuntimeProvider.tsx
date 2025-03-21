@@ -22,6 +22,8 @@ const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
 interface KnowledgeSourceDetailsContextType {
     details: KnowledgeSourceDetail[] | null;
     setDetails: (details: KnowledgeSourceDetail[] | null) => void;
+    thinking: string | null;
+    setThinking: (thinking: string | null) => void;
 }
 
 const KnowledgeSourceDetailsContext = createContext<KnowledgeSourceDetailsContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const { selectedSources } = useKnowledgeSources();
     const modelConfig = useModelConfig();
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
+    const [thinking, setThinking] = useState<string | null>(null);
 
     console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
@@ -127,6 +130,10 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setDetails(data.knowledge_source_details);
             console.log("Knowledge source details:", data.knowledge_source_details);
 
+            // Store the thinking content
+            setThinking(data.thinking || null);
+            console.log("Thinking content:", data.thinking);
+
             // Format the response, combining regular message with thinking content if available
             let formattedContent = data.message || "Sorry, there was no response from the API.";
 
@@ -153,7 +160,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const runtime = useLocalRuntime(myModelAdapter);
 
     return (
-        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails }}>
+        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking }}>
             <AssistantRuntimeProvider runtime={runtime}>
                 {children}
             </AssistantRuntimeProvider>

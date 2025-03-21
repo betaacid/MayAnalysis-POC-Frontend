@@ -7,6 +7,7 @@ interface SourcesPanelWrapperProps {
     children: ReactNode;
 }
 
+// This wrapper provides the Supporting Info panel functionality
 export const SourcesPanelWrapper: FC<SourcesPanelWrapperProps> = ({ children }) => {
     const [showSourcesPanel, setShowSourcesPanel] = useState(false);
 

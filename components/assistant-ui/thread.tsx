@@ -293,7 +293,7 @@ const AssistantActionBar: FC = () => {
 
       {/* Sources button */}
       <TooltipIconButton
-        tooltip={showSourcesPanel ? "Hide sources" : "Show sources"}
+        tooltip={showSourcesPanel ? "Hide supporting info" : "Show supporting info"}
         onClick={() => setShowSourcesPanel(!showSourcesPanel)}
         className={showSourcesPanel ? "text-primary" : ""}
       >
