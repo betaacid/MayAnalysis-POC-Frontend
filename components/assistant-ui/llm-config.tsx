@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Label } from "@/components/ui/label";
 
@@ -12,6 +14,8 @@ interface LLMConfigProps {
     defaultModel: string;
     defaultSystemPrompt: string;
     modelOptions: ModelOption[];
+    onModelChange?: (model: string) => void;
+    onSystemPromptChange?: (prompt: string) => void;
 }
 
 export const LLMConfig: React.FC<LLMConfigProps> = ({
@@ -20,6 +24,8 @@ export const LLMConfig: React.FC<LLMConfigProps> = ({
     defaultModel,
     defaultSystemPrompt,
     modelOptions,
+    onModelChange,
+    onSystemPromptChange,
 }) => {
     return (
         <div className="space-y-4">
@@ -34,7 +40,8 @@ export const LLMConfig: React.FC<LLMConfigProps> = ({
                 <Label htmlFor={`${title || "model"}-model`}>Model</Label>
                 <select
                     id={`${title || "model"}-model`}
-                    defaultValue={defaultModel}
+                    value={defaultModel}
+                    onChange={(e) => onModelChange && onModelChange(e.target.value)}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                     {modelOptions.map((model) => (
@@ -49,7 +56,8 @@ export const LLMConfig: React.FC<LLMConfigProps> = ({
                 <Label htmlFor={`${title || "model"}-prompt`}>System Prompt</Label>
                 <textarea
                     id={`${title || "model"}-prompt`}
-                    defaultValue={defaultSystemPrompt}
+                    value={defaultSystemPrompt}
+                    onChange={(e) => onSystemPromptChange && onSystemPromptChange(e.target.value)}
                     rows={5}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />

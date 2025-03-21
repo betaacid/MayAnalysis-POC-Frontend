@@ -9,6 +9,7 @@ import {
 import { extractTextContent } from "@/lib/types/message";
 import { useWebSearch } from "@/components/assistant-ui/web-search-context";
 import { useKnowledgeSources } from "@/components/assistant-ui/knowledge-sources-context";
+import { useModelConfig } from "@/components/assistant-ui/model-config";
 
 // Get API base URL from environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -19,10 +20,14 @@ const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
 export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const { includeWebSearch } = useWebSearch();
     const { selectedSources } = useKnowledgeSources();
+    const modelConfig = useModelConfig();
+
+    console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
     const myModelAdapter: ChatModelAdapter = {
         async run({ messages, abortSignal }) {
             console.log("Sending request to backend:", messages);
+            console.log("Using model configurations:", JSON.stringify(modelConfig, null, 2));
 
             // Get the latest message from the user
             const latestMessage = messages[messages.length - 1];
@@ -44,6 +49,37 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 ? ["all"]
                 : [...selectedSources];
 
+            // Create request body with all model configurations
+            const requestBody = {
+                message: messageContent,
+                history: history,
+                // Use configured chat model instead of hardcoded value
+                chat_model: modelConfig.chatModel || "openai:gpt-4o",
+                // Include system prompts
+                chat_system_prompt: modelConfig.chatSystemPrompt,
+                selection_model: modelConfig.selectionModel,
+                selection_system_prompt: modelConfig.selectionSystemPrompt,
+                search_model: modelConfig.searchModel,
+                search_system_prompt: modelConfig.searchSystemPrompt,
+                refinement_model: modelConfig.refinementModel,
+                refinement_system_prompt: modelConfig.refinementSystemPrompt,
+                // Other required fields
+                knowledge_sources: knowledgeSources,
+                exclude_web: !includeWebSearch,
+            };
+
+            console.log("Full API request body:", JSON.stringify(requestBody, null, 2));
+
+            // Console.log specific fields to help with debugging
+            console.log("Chat model:", requestBody.chat_model);
+            console.log("Chat system prompt:", requestBody.chat_system_prompt);
+            console.log("Selection model:", requestBody.selection_model);
+            console.log("Selection system prompt:", requestBody.selection_system_prompt);
+            console.log("Search model:", requestBody.search_model);
+            console.log("Search system prompt:", requestBody.search_system_prompt);
+            console.log("Refinement model:", requestBody.refinement_model);
+            console.log("Refinement system prompt:", requestBody.refinement_system_prompt);
+
             // Call the actual backend endpoint
             const result = await fetch(BACKEND_API_URL, {
                 method: "POST",
@@ -51,15 +87,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                     "Content-Type": "application/json",
                 },
                 // Format the request according to our FastAPI endpoint
-                body: JSON.stringify({
-                    message: messageContent,
-                    history: history,
-                    // Minimal required fields for the backend
-                    chat_model: "openai:gpt-4o",
-                    knowledge_sources: knowledgeSources,
-                    // Use the web search toggle state (inverted since we control include but API expects exclude)
-                    exclude_web: !includeWebSearch,
-                }),
+                body: JSON.stringify(requestBody),
                 signal: abortSignal,
             });
 

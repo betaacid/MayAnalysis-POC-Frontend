@@ -5,6 +5,7 @@ import { MyRuntimeProvider } from "./MyRuntimeProvider";
 import { SourcesPanelWrapper } from "./SourcesPanelWrapper";
 import { WebSearchProvider } from "@/components/assistant-ui/web-search-context";
 import { KnowledgeSourcesProvider } from "@/components/assistant-ui/knowledge-sources-context";
+import { ModelConfigProvider } from "@/components/assistant-ui/model-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,11 +35,13 @@ export default function RootLayout({
       >
         <WebSearchProvider>
           <KnowledgeSourcesProvider>
-            <SourcesPanelWrapper>
-              <MyRuntimeProvider>
-                {children}
-              </MyRuntimeProvider>
-            </SourcesPanelWrapper>
+            <ModelConfigProvider>
+              <SourcesPanelWrapper>
+                <MyRuntimeProvider>
+                  {children}
+                </MyRuntimeProvider>
+              </SourcesPanelWrapper>
+            </ModelConfigProvider>
           </KnowledgeSourcesProvider>
         </WebSearchProvider>
       </body>
