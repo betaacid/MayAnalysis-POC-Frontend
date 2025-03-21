@@ -8,8 +8,21 @@ import {
 import { LLMConfig } from "@/components/assistant-ui/llm-config";
 
 export const ModelConfig: React.FC = () => {
-    // Hardcoded values for now
-    const models = ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet", "anthropic.claude-3-haiku"];
+    // Model options with friendly names and their API values
+    const modelOptions = [
+        // OpenAI models
+        { label: "OpenAI GPT-4o", value: "openai:gpt-4o" },
+        { label: "OpenAI GPT-4o Mini", value: "openai:gpt-4o-mini" },
+        { label: "OpenAI GPT-4 Turbo", value: "openai:gpt-4-turbo" },
+
+        // Groq models
+        { label: "Groq Deepseek", value: "groq:deepseek-r1-distill-llama-70b" },
+        { label: "Groq Llama 3 (70B)", value: "groq:llama3-70b-8192" },
+        { label: "Groq Mixtral 8x7B", value: "groq:mixtral-8x7b" },
+
+        // Cerebras models
+        { label: "Cerebras Llama 3.3 (70B)", value: "cerebras:llama-3.3-70b" }
+    ];
 
     // Default values taken directly from system_prompts.py, with added linebreaks for readability
     const defaultChatSystemPrompt = `You are an AI assistant for real estate investment analysis.
@@ -59,9 +72,9 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="The primary model used for generating responses to user messages."
-                            defaultModel="gpt-4"
+                            defaultModel="groq:deepseek-r1-distill-llama-70b"
                             defaultSystemPrompt={defaultChatSystemPrompt}
-                            models={models}
+                            modelOptions={modelOptions}
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -72,9 +85,9 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="Determines which knowledge sources to use when 'All sources' is selected."
-                            defaultModel="gpt-3.5-turbo"
+                            defaultModel="openai:gpt-4o-mini"
                             defaultSystemPrompt={defaultSelectionSystemPrompt}
-                            models={models}
+                            modelOptions={modelOptions}
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -85,9 +98,9 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="Used for performing web searches to find relevant information online."
-                            defaultModel="gpt-3.5-turbo"
+                            defaultModel="openai:gpt-4o"
                             defaultSystemPrompt={defaultSearchSystemPrompt}
-                            models={models}
+                            modelOptions={modelOptions}
                         />
                     </AccordionContent>
                 </AccordionItem>
@@ -98,9 +111,9 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="Helps transform user queries into effective search queries for the Search Model."
-                            defaultModel="gpt-3.5-turbo"
+                            defaultModel="openai:gpt-4-turbo"
                             defaultSystemPrompt={defaultRefinementSystemPrompt}
-                            models={models}
+                            modelOptions={modelOptions}
                         />
                     </AccordionContent>
                 </AccordionItem>
