@@ -4,10 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Removed 'output: export' to enable server-side rendering
 
-  // Enable build caching
+  // Enable build caching with safer options
   experimental: {
-    // Next.js 15 caching options
-    optimizeCss: true,
+    // Removed optimizeCss that requires critters module
     optimizeServerReact: true,
   },
 
