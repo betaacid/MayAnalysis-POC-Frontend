@@ -21,7 +21,8 @@ const sourceDisplayNames: Record<KnowledgeSource, string> = {
     labs: "Labs",
     rent_roll: "Rent Roll",
     offering_memorandum: "Offering Memorandum",
-    financial_analysis: "Financial Analysis"
+    financial_analysis: "Financial Analysis",
+    web_search: "Web Search"
 };
 
 // All available sources (excluding web_search as requested)
