@@ -35,6 +35,19 @@ export const ModelConfig: React.FC = () => {
         { label: "Groq Llama 3 (70B)", value: "groq:llama3-70b-8192" }
     ];
 
+    // Specialized options for the Search Model
+    const searchModelOptions = [
+        // OpenAI search-specific model
+        { label: "OpenAI GPT-4o Search Preview", value: "openai:gpt-4o-search-preview" },
+
+        // Perplexity models specialized for search/research
+        { label: "Perplexity Sonar", value: "perplexity:sonar" },
+        { label: "Perplexity Sonar Pro", value: "perplexity:sonar-pro" },
+        { label: "Perplexity Sonar Reasoning", value: "perplexity:sonar-reasoning" },
+        { label: "Perplexity Sonar Reasoning Pro", value: "perplexity:sonar-reasoning-pro" },
+        { label: "Perplexity Sonar Deep Research", value: "perplexity:sonar-deep-research" }
+    ];
+
     // Default values taken directly from system_prompts.py, with added linebreaks for readability
     const defaultChatSystemPrompt = `You are an AI assistant for real estate investment analysis.
 
@@ -109,9 +122,9 @@ Return ONLY the refined query without any explanation or additional text.`;
                         <LLMConfig
                             title=""
                             explanation="Used for performing web searches to find relevant information online."
-                            defaultModel="openai:gpt-4o"
+                            defaultModel="perplexity:sonar-pro"
                             defaultSystemPrompt={defaultSearchSystemPrompt}
-                            modelOptions={modelOptions}
+                            modelOptions={searchModelOptions}
                         />
                     </AccordionContent>
                 </AccordionItem>
