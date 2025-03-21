@@ -12,7 +12,8 @@ export type KnowledgeSource =
     | "labs"
     | "rent_roll"
     | "offering_memorandum"
-    | "financial_analysis";
+    | "financial_analysis"
+    | "web_search";
 
 // Create a context for knowledge sources
 interface KnowledgeSourcesContextType {

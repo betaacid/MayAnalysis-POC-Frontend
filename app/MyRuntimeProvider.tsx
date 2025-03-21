@@ -10,17 +10,37 @@ import { extractTextContent } from "@/lib/types/message";
 import { useWebSearch } from "@/components/assistant-ui/web-search-context";
 import { useKnowledgeSources } from "@/components/assistant-ui/knowledge-sources-context";
 import { useModelConfig } from "@/components/assistant-ui/model-config";
+import { KnowledgeSourceDetail, ChatApiResponse } from "@/lib/types/knowledge-source";
+import { createContext, useContext, useState } from "react";
 
 // Get API base URL from environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 // Construct the full endpoint URL
 const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
 
+// Create a context for knowledge source details
+interface KnowledgeSourceDetailsContextType {
+    details: KnowledgeSourceDetail[] | null;
+    setDetails: (details: KnowledgeSourceDetail[] | null) => void;
+}
+
+const KnowledgeSourceDetailsContext = createContext<KnowledgeSourceDetailsContextType | undefined>(undefined);
+
+// Hook to use the knowledge source details context
+export const useKnowledgeSourceDetails = () => {
+    const context = useContext(KnowledgeSourceDetailsContext);
+    if (context === undefined) {
+        throw new Error('useKnowledgeSourceDetails must be used within a KnowledgeSourceDetailsProvider');
+    }
+    return context;
+};
+
 // Create a custom runtime adapter that integrates with our sources panel
 export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const { includeWebSearch } = useWebSearch();
     const { selectedSources } = useKnowledgeSources();
     const modelConfig = useModelConfig();
+    const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
 
     console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
@@ -100,8 +120,12 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             }
 
             // Process the response
-            const data = await result.json();
+            const data = await result.json() as ChatApiResponse;
             console.log("API response data:", data);
+
+            // Store the knowledge source details for later use in the Sources panel
+            setDetails(data.knowledge_source_details);
+            console.log("Knowledge source details:", data.knowledge_source_details);
 
             // Format the response, combining regular message with thinking content if available
             let formattedContent = data.message || "Sorry, there was no response from the API.";
@@ -129,8 +153,10 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const runtime = useLocalRuntime(myModelAdapter);
 
     return (
-        <AssistantRuntimeProvider runtime={runtime}>
-            {children}
-        </AssistantRuntimeProvider>
+        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails }}>
+            <AssistantRuntimeProvider runtime={runtime}>
+                {children}
+            </AssistantRuntimeProvider>
+        </KnowledgeSourceDetailsContext.Provider>
     );
 } 

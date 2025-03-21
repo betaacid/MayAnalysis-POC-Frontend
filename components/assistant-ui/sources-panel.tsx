@@ -3,6 +3,7 @@
 import { FC, createContext, useContext } from "react";
 import { XIcon } from "lucide-react";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { useKnowledgeSourceDetails } from "@/app/MyRuntimeProvider";
 
 // Create a context for the sources panel
 interface SourcesPanelContextType {
@@ -27,6 +28,8 @@ export const SourcesPanelProvider = SourcesPanelContext.Provider;
 // The Sources Panel component
 export const SourcesPanel: FC = () => {
     const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
+    // Access knowledge source details through the context hook
+    const { details } = useKnowledgeSourceDetails();
 
     if (!showSourcesPanel) return null;
 
@@ -42,10 +45,18 @@ export const SourcesPanel: FC = () => {
                 </TooltipIconButton>
             </div>
             <div className="p-4 overflow-y-auto flex-grow">
-                <div className="text-sm text-gray-600">
-                    {/* Sources content will go here */}
-                    No sources available for this message.
-                </div>
+                {details && details.length > 0 ? (
+                    <div className="space-y-4">
+                        {/* We'll implement the full UI later */}
+                        <div className="text-sm text-gray-600">
+                            {details.length} sources available
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-sm text-gray-600">
+                        No sources available for this message.
+                    </div>
+                )}
             </div>
         </div>
     );
