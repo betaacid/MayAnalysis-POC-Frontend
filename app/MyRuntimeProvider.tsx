@@ -134,17 +134,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setThinking(data.thinking || null);
             console.log("Thinking content:", data.thinking);
 
-            // Format the response, combining regular message with thinking content if available
-            let formattedContent = data.message || "Sorry, there was no response from the API.";
-
-            // Add thinking content with pure markdown formatting (no HTML tags)
-            if (data.thinking) {
-                // Use blockquote (>) to make text appear smaller, and keep it italic with asterisks
-                const thinkingLines = data.thinking.replace(/\*/g, '\\*').split('\n');
-                const formattedThinking = thinkingLines.map((line: string) => `> *${line}*`).join('\n');
-
-                formattedContent += `\n\n---\n\n#### 💭 Thinking Process\n\n${formattedThinking}`;
-            }
+            // Format the response - only use the regular message
+            const formattedContent = data.message || "Sorry, there was no response from the API.";
 
             return {
                 content: [
