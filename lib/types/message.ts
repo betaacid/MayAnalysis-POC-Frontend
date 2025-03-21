@@ -8,6 +8,12 @@ export interface TextContent {
   text: string;
 }
 
+// Thinking content for showing model's reasoning
+export interface ThinkingContent {
+  type: 'thinking';
+  text: string;
+}
+
 // Generic content with any other type
 export interface OtherContent {
   type: string;
@@ -17,8 +23,14 @@ export interface OtherContent {
 // Union type for different content items
 export type ContentItem = TextContent | OtherContent;
 
-// Value that can be a string, content item, or array of content items
-export type ContentValue = string | ContentItem | ReadonlyArray<ContentItem>;
+// Content value types
+export type ContentValue =
+  | string
+  | TextContent
+  | ThinkingContent
+  | readonly unknown[]
+  | (TextContent | ThinkingContent)[]
+  | Record<string, unknown>;
 
 /**
  * Extracts plain text from various message content formats
@@ -37,7 +49,7 @@ export const extractTextContent = (content: ContentValue): string => {
           part &&
           typeof part === 'object' &&
           'type' in part &&
-          part.type === 'text' &&
+          (part.type === 'text' || part.type === 'thinking') &&
           'text' in part
         ) {
           return part.text as string;
@@ -52,7 +64,10 @@ export const extractTextContent = (content: ContentValue): string => {
       !Array.isArray(content) &&
       'type' in content
     ) {
-      if (content.type === 'text' && 'text' in content) {
+      if (
+        (content.type === 'text' || content.type === 'thinking') &&
+        'text' in content
+      ) {
         return content.text as string;
       }
     }

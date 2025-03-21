@@ -103,13 +103,24 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             const data = await result.json();
             console.log("API response data:", data);
 
-            // Extract just the message from the response
+            // Format the response, combining regular message with thinking content if available
+            let formattedContent = data.message || "Sorry, there was no response from the API.";
+
+            // Add thinking content with pure markdown formatting (no HTML tags)
+            if (data.thinking) {
+                // Use blockquote (>) to make text appear smaller, and keep it italic with asterisks
+                const thinkingLines = data.thinking.replace(/\*/g, '\\*').split('\n');
+                const formattedThinking = thinkingLines.map((line: string) => `> *${line}*`).join('\n');
+
+                formattedContent += `\n\n---\n\n#### 💭 Thinking Process\n\n${formattedThinking}`;
+            }
+
             return {
                 content: [
                     {
                         type: "text",
-                        text: data.message || "Sorry, there was no response from the API.",
-                    },
+                        text: formattedContent
+                    }
                 ],
             };
         },
