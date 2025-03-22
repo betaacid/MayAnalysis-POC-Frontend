@@ -19,6 +19,8 @@ interface ModelConfigContextType {
     searchSystemPrompt: string;
     refinementModel: string;
     refinementSystemPrompt: string;
+    biasEvaluationModel: string;
+    biasEvaluationSystemPrompt: string;
     setChatModel: (model: string) => void;
     setChatSystemPrompt: (prompt: string) => void;
     setSelectionModel: (model: string) => void;
@@ -27,6 +29,8 @@ interface ModelConfigContextType {
     setSearchSystemPrompt: (prompt: string) => void;
     setRefinementModel: (model: string) => void;
     setRefinementSystemPrompt: (prompt: string) => void;
+    setBiasEvaluationModel: (model: string) => void;
+    setBiasEvaluationSystemPrompt: (prompt: string) => void;
 }
 
 // Default values for system prompts
@@ -68,6 +72,26 @@ Make queries precise, clear, and search-engine friendly. Remove unnecessary word
 
 Return ONLY the refined query without any explanation or additional text.`;
 
+const defaultBiasEvaluationSystemPrompt = `You are a bias detection expert specializing in real estate investment analysis. 
+Your task is to evaluate content for potential biases that could affect real estate investment decisions.
+
+Types of biases to look for:
+1. Geographic bias - Unfair preference or discrimination against certain neighborhoods, cities, or regions
+2. Socioeconomic bias - Assumptions based on income levels, property values, or economic status
+3. Demographic bias - Assumptions or stereotypes based on race, ethnicity, age, gender, religion, or family status
+4. Confirmation bias - Seeking or interpreting information that confirms pre-existing beliefs about investments
+5. Recency bias - Overweighting recent market trends or events
+6. Anchoring bias - Over-reliance on first piece of information encountered (like initial asking price)
+7. Status quo bias - Preference for current conditions and resistance to change
+8. Loss aversion bias - Preference to avoid losses over acquiring gains of equal value
+
+For each evaluation, assess if these biases appear in:
+- The user's question
+- The context information provided
+- The response generated
+
+Provide a fair, balanced assessment with specific examples from the content.`;
+
 // Create context with default values
 export const ModelConfigContext = createContext<ModelConfigContextType>({
     chatModel: "groq:deepseek-r1-distill-llama-70b",
@@ -78,6 +102,8 @@ export const ModelConfigContext = createContext<ModelConfigContextType>({
     searchSystemPrompt: defaultSearchSystemPrompt,
     refinementModel: "cerebras:llama-3.3-70b",
     refinementSystemPrompt: defaultRefinementSystemPrompt,
+    biasEvaluationModel: "groq:llama3-70b-8192",
+    biasEvaluationSystemPrompt: defaultBiasEvaluationSystemPrompt,
     setChatModel: () => { },
     setChatSystemPrompt: () => { },
     setSelectionModel: () => { },
@@ -86,6 +112,8 @@ export const ModelConfigContext = createContext<ModelConfigContextType>({
     setSearchSystemPrompt: () => { },
     setRefinementModel: () => { },
     setRefinementSystemPrompt: () => { },
+    setBiasEvaluationModel: () => { },
+    setBiasEvaluationSystemPrompt: () => { },
 });
 
 // Hook to use the model config context
@@ -102,6 +130,8 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [searchSystemPrompt, setSearchSystemPrompt] = useState(defaultSearchSystemPrompt);
     const [refinementModel, setRefinementModel] = useState("cerebras:llama-3.3-70b");
     const [refinementSystemPrompt, setRefinementSystemPrompt] = useState(defaultRefinementSystemPrompt);
+    const [biasEvaluationModel, setBiasEvaluationModel] = useState("groq:llama3-70b-8192");
+    const [biasEvaluationSystemPrompt, setBiasEvaluationSystemPrompt] = useState(defaultBiasEvaluationSystemPrompt);
 
     // Create context value object with current state and setters
     const contextValue = {
@@ -113,6 +143,8 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
         searchSystemPrompt,
         refinementModel,
         refinementSystemPrompt,
+        biasEvaluationModel,
+        biasEvaluationSystemPrompt,
         setChatModel,
         setChatSystemPrompt,
         setSelectionModel,
@@ -120,7 +152,9 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
         setSearchModel,
         setSearchSystemPrompt,
         setRefinementModel,
-        setRefinementSystemPrompt
+        setRefinementSystemPrompt,
+        setBiasEvaluationModel,
+        setBiasEvaluationSystemPrompt
     };
 
     return (
@@ -180,6 +214,8 @@ export const ModelConfig: React.FC = () => {
         searchSystemPrompt,
         refinementModel,
         refinementSystemPrompt,
+        biasEvaluationModel,
+        biasEvaluationSystemPrompt,
         setChatModel,
         setChatSystemPrompt,
         setSelectionModel,
@@ -187,7 +223,9 @@ export const ModelConfig: React.FC = () => {
         setSearchModel,
         setSearchSystemPrompt,
         setRefinementModel,
-        setRefinementSystemPrompt
+        setRefinementSystemPrompt,
+        setBiasEvaluationModel,
+        setBiasEvaluationSystemPrompt
     } = useModelConfig();
 
     return (
@@ -251,6 +289,21 @@ export const ModelConfig: React.FC = () => {
                             modelOptions={modelOptions}
                             onModelChange={setRefinementModel}
                             onSystemPromptChange={setRefinementSystemPrompt}
+                        />
+                    </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="bias-evaluation-model">
+                    <AccordionTrigger>Bias Evaluation Model</AccordionTrigger>
+                    <AccordionContent className="px-1">
+                        <LLMConfig
+                            title=""
+                            explanation="Used to evaluate queries, context, and responses for potential biases in real estate investment research."
+                            defaultModel={biasEvaluationModel}
+                            defaultSystemPrompt={biasEvaluationSystemPrompt}
+                            modelOptions={selectionModelOptions}
+                            onModelChange={setBiasEvaluationModel}
+                            onSystemPromptChange={setBiasEvaluationSystemPrompt}
                         />
                     </AccordionContent>
                 </AccordionItem>

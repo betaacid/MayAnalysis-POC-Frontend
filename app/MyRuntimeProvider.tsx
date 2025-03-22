@@ -86,6 +86,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 search_system_prompt: modelConfig.searchSystemPrompt,
                 refinement_model: modelConfig.refinementModel,
                 refinement_system_prompt: modelConfig.refinementSystemPrompt,
+                bias_evaluation_model: modelConfig.biasEvaluationModel,
+                bias_evaluation_system_prompt: modelConfig.biasEvaluationSystemPrompt,
                 // Other required fields
                 knowledge_sources: knowledgeSources,
                 exclude_web: !includeWebSearch,
@@ -102,6 +104,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             console.log("Search system prompt:", requestBody.search_system_prompt);
             console.log("Refinement model:", requestBody.refinement_model);
             console.log("Refinement system prompt:", requestBody.refinement_system_prompt);
+            console.log("Bias evaluation model:", requestBody.bias_evaluation_model);
+            console.log("Bias evaluation system prompt:", requestBody.bias_evaluation_system_prompt);
 
             // Call the actual backend endpoint
             const result = await fetch(BACKEND_API_URL, {
