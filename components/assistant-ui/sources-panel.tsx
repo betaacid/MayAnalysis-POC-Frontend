@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FC, createContext, useContext, useState } from "react";
-import { BookOpen, FileText, XIcon, Globe, Database, Home, Building, ChevronDown, ChevronUp, BrainIcon } from "lucide-react";
+import { BookOpen, FileText, XIcon, Globe, Database, Home, Building, ChevronDown, ChevronUp, BrainIcon, AlertTriangle } from "lucide-react";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { useKnowledgeSourceDetails } from "@/app/MyRuntimeProvider";
 import { KnowledgeSourceDetail } from "@/lib/types/knowledge-source";
@@ -39,6 +39,115 @@ const sourceIconMap: Record<string, React.ReactNode> = {
     property_info: <Home size={16} />,
     // Default icon for any unmapped source
     default: <FileText size={16} />
+};
+
+// Component for displaying the bias evaluation results
+interface BiasEvaluationPanelProps {
+    biasEvaluation: {
+        bias_likelihood: "low" | "medium" | "high" | "unknown";
+        explanation: string;
+        biases_detected?: Array<{
+            bias_type: string;
+            severity: "low" | "medium" | "high";
+            description: string;
+            location: string;
+        }>;
+    };
+}
+
+const BiasEvaluationPanel: FC<BiasEvaluationPanelProps> = ({ biasEvaluation }) => {
+    const [expanded, setExpanded] = useState(true);
+
+    // Color mapping for bias severity
+    const getSeverityColor = (severity: string) => {
+        switch (severity) {
+            case 'low':
+                return 'bg-green-100 text-green-800';
+            case 'medium':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'high':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    // Get background color for the header based on bias likelihood
+    const getHeaderColor = (likelihood: string) => {
+        switch (likelihood) {
+            case 'low':
+                return 'bg-green-50';
+            case 'medium':
+                return 'bg-yellow-50';
+            case 'high':
+                return 'bg-red-50';
+            default:
+                return 'bg-gray-50';
+        }
+    };
+
+    // Get text color for the header based on bias likelihood
+    const getHeaderTextColor = (likelihood: string) => {
+        switch (likelihood) {
+            case 'low':
+                return 'text-green-700';
+            case 'medium':
+                return 'text-yellow-700';
+            case 'high':
+                return 'text-red-700';
+            default:
+                return 'text-gray-700';
+        }
+    };
+
+    return (
+        <div className="border rounded-lg overflow-hidden mb-4 shadow-sm">
+            {/* Header with icon, name, and expand/collapse button */}
+            <div
+                className={`flex items-center justify-between p-3 cursor-pointer ${getHeaderColor(biasEvaluation.bias_likelihood)}`}
+                onClick={() => setExpanded(!expanded)}
+            >
+                <div className="flex items-center gap-2">
+                    <span className={getHeaderTextColor(biasEvaluation.bias_likelihood)}><AlertTriangle size={16} /></span>
+                    <h3 className={`font-medium text-sm ${getHeaderTextColor(biasEvaluation.bias_likelihood)}`}>Bias Evaluation</h3>
+                </div>
+                <div className="flex items-center">
+                    <span className={`text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full ${getSeverityColor(biasEvaluation.bias_likelihood)}`}>
+                        {biasEvaluation.bias_likelihood.charAt(0).toUpperCase() + biasEvaluation.bias_likelihood.slice(1)}
+                    </span>
+                    <button className={getHeaderTextColor(biasEvaluation.bias_likelihood)}>
+                        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Content area - collapsible */}
+            {expanded && (
+                <div className="p-3 text-sm border-t bg-white">
+                    <div className="prose prose-sm max-w-none text-slate-700">
+                        <p className="mb-2">{biasEvaluation.explanation}</p>
+
+                        {biasEvaluation.biases_detected && biasEvaluation.biases_detected.length > 0 && (
+                            <div className="mt-3">
+                                <p className="font-medium mb-1">Detected Biases:</p>
+                                <ul className="list-disc pl-4 space-y-1">
+                                    {biasEvaluation.biases_detected.map((bias, index) => (
+                                        <li key={index}>
+                                            <span className="font-medium">{bias.bias_type}</span>
+                                            <span className={`text-xs font-medium mx-1 px-1.5 py-0.5 rounded-full ${getSeverityColor(bias.severity)}`}>
+                                                {bias.severity}
+                                            </span>
+                                            <div className="text-xs mt-0.5">{bias.description}</div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 };
 
 // Component for displaying the thinking content
@@ -120,11 +229,11 @@ const SourceItem: FC<SourceItemProps> = ({ source }) => {
 export const SourcesPanel: FC = () => {
     const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
     // Access knowledge source details and thinking through the context hook
-    const { details, thinking } = useKnowledgeSourceDetails();
+    const { details, thinking, biasEvaluation } = useKnowledgeSourceDetails();
 
     if (!showSourcesPanel) return null;
 
-    const hasContent = (thinking != null) || (details && details.length > 0);
+    const hasContent = (thinking != null) || (details && details.length > 0) || (biasEvaluation != null);
 
     return (
         <div className="fixed right-0 top-0 bottom-0 w-80 border-l bg-white shadow-md z-20 flex flex-col">
@@ -146,6 +255,17 @@ export const SourcesPanel: FC = () => {
             <div className="p-4 overflow-y-auto flex-grow">
                 {hasContent ? (
                     <div>
+                        {/* Bias Evaluation section */}
+                        {biasEvaluation && (
+                            <div className="mb-6">
+                                <h3 className="text-sm font-semibold text-slate-700 mb-2">Bias Evaluation</h3>
+                                <p className="text-xs text-slate-500 mb-3">
+                                    This shows the AI&apos;s bias evaluation and detected biases.
+                                </p>
+                                <BiasEvaluationPanel biasEvaluation={biasEvaluation} />
+                            </div>
+                        )}
+
                         {/* Thinking section */}
                         {thinking && (
                             <div className="mb-6">

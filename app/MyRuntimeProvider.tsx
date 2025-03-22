@@ -24,6 +24,8 @@ interface KnowledgeSourceDetailsContextType {
     setDetails: (details: KnowledgeSourceDetail[] | null) => void;
     thinking: string | null;
     setThinking: (thinking: string | null) => void;
+    biasEvaluation: ChatApiResponse['bias_evaluation'];
+    setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation']) => void;
 }
 
 const KnowledgeSourceDetailsContext = createContext<KnowledgeSourceDetailsContextType | undefined>(undefined);
@@ -44,6 +46,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const modelConfig = useModelConfig();
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
     const [thinking, setThinking] = useState<string | null>(null);
+    const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
 
     console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
@@ -138,6 +141,10 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setThinking(data.thinking || null);
             console.log("Thinking content:", data.thinking);
 
+            // Store the bias evaluation results
+            setBiasEvaluation(data.bias_evaluation || null);
+            console.log("Bias evaluation:", data.bias_evaluation);
+
             // Format the response - only use the regular message
             const formattedContent = data.message || "Sorry, there was no response from the API.";
 
@@ -155,7 +162,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const runtime = useLocalRuntime(myModelAdapter);
 
     return (
-        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking }}>
+        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking, biasEvaluation, setBiasEvaluation }}>
             <AssistantRuntimeProvider runtime={runtime}>
                 {children}
             </AssistantRuntimeProvider>

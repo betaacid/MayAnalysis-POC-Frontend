@@ -31,4 +31,14 @@ export interface ChatApiResponse {
   }>;
   knowledge_source_details: KnowledgeSourceDetail[] | null;
   thinking?: string;
+  bias_evaluation?: {
+    bias_likelihood: 'low' | 'medium' | 'high' | 'unknown';
+    explanation: string;
+    biases_detected?: Array<{
+      bias_type: string;
+      severity: 'low' | 'medium' | 'high';
+      description: string;
+      location: string;
+    }>;
+  } | null;
 }
