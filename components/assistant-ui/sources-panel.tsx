@@ -55,67 +55,56 @@ interface BiasEvaluationPanelProps {
     };
 }
 
-const BiasEvaluationPanel: FC<BiasEvaluationPanelProps> = ({ biasEvaluation }) => {
+const BiasEvaluationPanel: React.FC<BiasEvaluationPanelProps> = ({ biasEvaluation }) => {
     const [expanded, setExpanded] = useState(true);
 
-    // Color mapping for bias severity
-    const getSeverityColor = (severity: string) => {
-        switch (severity) {
-            case 'low':
-                return 'bg-green-100 text-green-800';
-            case 'medium':
-                return 'bg-yellow-100 text-yellow-800';
+    // Get appropriate color based on bias likelihood
+    const getBiasLikelihoodColor = (likelihood: string) => {
+        switch (likelihood.toLowerCase()) {
             case 'high':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-100 text-red-800 border-red-200';
+            case 'medium':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'low':
+                return 'bg-green-100 text-green-800 border-green-200';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-blue-100 text-blue-800 border-blue-200';
         }
     };
 
-    // Get background color for the header based on bias likelihood
-    const getHeaderColor = (likelihood: string) => {
-        switch (likelihood) {
-            case 'low':
-                return 'bg-green-50';
-            case 'medium':
-                return 'bg-yellow-50';
+    // Get icon color based on bias likelihood
+    const getBiasLikelihoodIconColor = (likelihood: string) => {
+        switch (likelihood.toLowerCase()) {
             case 'high':
-                return 'bg-red-50';
+                return 'text-red-500';
+            case 'medium':
+                return 'text-yellow-500';
+            case 'low':
+                return 'text-green-500';
             default:
-                return 'bg-gray-50';
+                return 'text-blue-500';
         }
     };
 
-    // Get text color for the header based on bias likelihood
-    const getHeaderTextColor = (likelihood: string) => {
-        switch (likelihood) {
-            case 'low':
-                return 'text-green-700';
-            case 'medium':
-                return 'text-yellow-700';
-            case 'high':
-                return 'text-red-700';
-            default:
-                return 'text-gray-700';
-        }
-    };
+    const likelihoodColor = getBiasLikelihoodColor(biasEvaluation.bias_likelihood);
+    const iconColor = getBiasLikelihoodIconColor(biasEvaluation.bias_likelihood);
 
     return (
         <div className="border rounded-lg overflow-hidden mb-4 shadow-sm">
             {/* Header with icon, name, and expand/collapse button */}
             <div
-                className={`flex items-center justify-between p-3 cursor-pointer ${getHeaderColor(biasEvaluation.bias_likelihood)}`}
+                className={`flex items-center justify-between p-3 ${getBiasLikelihoodColor(biasEvaluation.bias_likelihood)} cursor-pointer`}
                 onClick={() => setExpanded(!expanded)}
             >
                 <div className="flex items-center gap-2">
-                    <span className={getHeaderTextColor(biasEvaluation.bias_likelihood)}><AlertTriangle size={16} /></span>
-                    <h3 className={`font-medium text-sm ${getHeaderTextColor(biasEvaluation.bias_likelihood)}`}>Bias Evaluation</h3>
+                    <AlertTriangle className={`h-5 w-5 ${iconColor}`} />
+                    <h3 className="font-medium text-sm">Bias Assessment</h3>
                 </div>
                 <div className="flex items-center">
-                    <span className={`text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full ${getSeverityColor(biasEvaluation.bias_likelihood)}`}>
+                    <span className={`text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full ${likelihoodColor}`}>
                         {biasEvaluation.bias_likelihood.charAt(0).toUpperCase() + biasEvaluation.bias_likelihood.slice(1)}
                     </span>
-                    <button className={getHeaderTextColor(biasEvaluation.bias_likelihood)}>
+                    <button className={iconColor}>
                         {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                 </div>
@@ -130,14 +119,10 @@ const BiasEvaluationPanel: FC<BiasEvaluationPanelProps> = ({ biasEvaluation }) =
                         {biasEvaluation.biases_detected && biasEvaluation.biases_detected.length > 0 && (
                             <div className="mt-3">
                                 <p className="font-medium mb-1">Detected Biases:</p>
-                                <ul className="list-disc pl-4 space-y-1">
+                                <ul className="list-disc pl-5 space-y-1">
                                     {biasEvaluation.biases_detected.map((bias, index) => (
                                         <li key={index}>
-                                            <span className="font-medium">{bias.bias_type}</span>
-                                            <span className={`text-xs font-medium mx-1 px-1.5 py-0.5 rounded-full ${getSeverityColor(bias.severity)}`}>
-                                                {bias.severity}
-                                            </span>
-                                            <div className="text-xs mt-0.5">{bias.description}</div>
+                                            <span className="font-medium">{bias.bias_type}:</span> {bias.description}
                                         </li>
                                     ))}
                                 </ul>
@@ -255,18 +240,7 @@ export const SourcesPanel: FC = () => {
             <div className="p-4 overflow-y-auto flex-grow">
                 {hasContent ? (
                     <div>
-                        {/* Bias Evaluation section */}
-                        {biasEvaluation && (
-                            <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-slate-700 mb-2">Bias Evaluation</h3>
-                                <p className="text-xs text-slate-500 mb-3">
-                                    This shows the AI&apos;s bias evaluation and detected biases.
-                                </p>
-                                <BiasEvaluationPanel biasEvaluation={biasEvaluation} />
-                            </div>
-                        )}
-
-                        {/* Thinking section */}
+                        {/* Thinking section first */}
                         {thinking && (
                             <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Thinking Process</h3>
@@ -279,7 +253,7 @@ export const SourcesPanel: FC = () => {
 
                         {/* Knowledge sources section */}
                         {details && details.length > 0 && (
-                            <div>
+                            <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Sources</h3>
                                 <p className="text-xs text-slate-500 mb-3">
                                     Information from these sources was used to generate the response.
@@ -289,6 +263,17 @@ export const SourcesPanel: FC = () => {
                                         <SourceItem key={`${source.source_enum}-${index}`} source={source} />
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Bias Evaluation section last */}
+                        {biasEvaluation && (
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-700 mb-2">Bias Evaluation</h3>
+                                <p className="text-xs text-slate-500 mb-3">
+                                    This shows the AI&apos;s bias evaluation and detected biases.
+                                </p>
+                                <BiasEvaluationPanel biasEvaluation={biasEvaluation} />
                             </div>
                         )}
                     </div>
