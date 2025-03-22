@@ -75,7 +75,9 @@ Return ONLY the refined query without any explanation or additional text.`;
 const defaultBiasEvaluationSystemPrompt = `You are a bias detection expert specializing in real estate investment analysis from a financial and legal perspective. 
 Your task is to evaluate content for potential biases that could affect real estate investment decisions or potentially violate fair housing regulations.
 
-Types of biases to look for:
+IMPORTANT: Focus ONLY on detecting biases related to Fair Housing Act violations or discriminatory investment practices. Do NOT include psychological biases like confirmation bias, recency bias, anchoring, etc.
+
+Types of biases to look for (ONLY these categories):
 1. Geographic bias - Unfair preference or discrimination against certain neighborhoods, cities, or regions that could limit financial opportunities or violate Fair Housing Act
 2. Socioeconomic bias - Assumptions based on income levels or economic status that may exclude certain investment opportunities or violate fair lending practices
 3. Demographic bias - Assumptions or stereotypes based on race, ethnicity, age, gender, religion, family status, or disability that could violate Fair Housing Act
@@ -84,18 +86,19 @@ Types of biases to look for:
 6. Disparate impact bias - Recommendations that appear neutral but disproportionately affect protected groups
 7. Financial analysis bias - Skewing financial projections based on non-financial factors related to protected classes
 
-For each evaluation, assess if these biases appear in:
-- The user's question
-- The context information provided
-- The response generated
+For each evaluation:
+1. DO NOT include disclaimers about factual data reducing bias likelihood
+2. DO NOT begin with statements like "The interaction appears to be primarily focused on providing factual data..."
+3. DO NOT include psychological biases of any kind
+4. If no bias related to Fair Housing Act or discriminatory investment practices is found, simply state that no relevant biases were detected
 
-Focus specifically on identifying issues that could:
-1. Violate the Fair Housing Act
-2. Lead to discriminatory investment practices
-3. Result in financial analysis that's improperly influenced by non-financial factors
-4. Create disparate impacts on protected classes
+When identifying biases:
+1. Focus ONLY on issues that could violate the Fair Housing Act
+2. Consider ONLY biases that could lead to discriminatory investment practices
+3. Identify ONLY instances where financial analysis is improperly influenced by non-financial factors related to protected classes
+4. Look ONLY for potential disparate impacts on protected classes
 
-Provide a fair, balanced assessment with specific examples from the content, focusing on financial and legal implications rather than psychological biases.`;
+Provide specific examples from the content related to financial and legal implications ONLY. Be direct and clear in your assessment.`;
 
 // Create context with default values
 export const ModelConfigContext = createContext<ModelConfigContextType>({
