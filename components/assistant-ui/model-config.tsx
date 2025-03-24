@@ -191,8 +191,6 @@ const modelOptions = [
 // Limited model options for the Selection Model
 const selectionModelOptions = [
     // OpenAI models
-    { label: "OpenAI GPT-4o", value: "openai:gpt-4o" },
-    { label: "OpenAI GPT-4o Mini", value: "openai:gpt-4o-mini" },
     { label: "OpenAI GPT-4 Turbo", value: "openai:gpt-4-turbo" },
 
     // Only Llama 3 from Groq
