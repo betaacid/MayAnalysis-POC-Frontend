@@ -6,6 +6,7 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 import { useKnowledgeSourceDetails } from "@/app/MyRuntimeProvider";
 import { KnowledgeSourceDetail } from "@/lib/types/knowledge-source";
 import { KnowledgeSource } from "./knowledge-sources-context";
+import MarkdownContent from "@/components/ui/markdown-content";
 
 // Create a context for the sources panel
 interface SourcesPanelContextType {
@@ -115,7 +116,7 @@ const BiasEvaluationPanel: React.FC<BiasEvaluationPanelProps> = ({ biasEvaluatio
             {expanded && (
                 <div className="p-3 text-sm border-t bg-white">
                     <div className="prose prose-sm max-w-none text-slate-700">
-                        <p className="mb-2">{biasEvaluation.explanation}</p>
+                        <MarkdownContent content={biasEvaluation.explanation} />
 
                         {biasEvaluation.biases_detected && biasEvaluation.biases_detected.length > 0 && (
                             <div className="mt-3">
@@ -163,9 +164,7 @@ const ThinkingPanel: FC<ThinkingPanelProps> = ({ content }) => {
             {/* Content area - collapsible */}
             {expanded && (
                 <div className="p-3 text-sm border-t bg-white">
-                    <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">
-                        {content}
-                    </div>
+                    <MarkdownContent content={content} />
                 </div>
             )}
         </div>
@@ -238,9 +237,7 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
                                 <p className="text-xs text-blue-600 mt-2 italic">This is the full prompt sent to the search service</p>
                             </div>
                         )}
-                        <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">
-                            {displayContent()}
-                        </div>
+                        <MarkdownContent content={displayContent()} />
 
                         {/* Show Full Text button for offering memorandum */}
                         {isOfferingMemorandum && source.text.length > 200 && (
@@ -279,9 +276,7 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
 
                         {/* Modal content */}
                         <div className="p-6 overflow-y-auto flex-grow">
-                            <div className="prose prose-lg max-w-none text-slate-700 whitespace-pre-wrap">
-                                {source.text}
-                            </div>
+                            <MarkdownContent content={source.text} />
                         </div>
 
                         {/* Modal footer */}
@@ -311,7 +306,7 @@ export const SourcesPanel: FC = () => {
     const hasContent = (thinking != null) || (details && details.length > 0) || (biasEvaluation != null);
 
     return (
-        <div className="fixed right-0 top-0 bottom-0 w-80 border-l bg-white shadow-md z-20 flex flex-col">
+        <div className="fixed right-0 top-0 bottom-0 w-96 border-l bg-white shadow-md z-20 flex flex-col">
             {/* Panel Header */}
             <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
                 <div className="flex items-center gap-2">
