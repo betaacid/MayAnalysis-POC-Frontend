@@ -22,8 +22,8 @@ const BACKEND_API_URL = `${API_BASE_URL}/chat/property/123/message`;
 interface KnowledgeSourceDetailsContextType {
     details: KnowledgeSourceDetail[] | null;
     setDetails: (details: KnowledgeSourceDetail[] | null) => void;
-    thinking: string | null;
-    setThinking: (thinking: string | null) => void;
+    thinking: string[] | null;
+    setThinking: (thinking: string[] | null) => void;
     biasEvaluation: ChatApiResponse['bias_evaluation'];
     setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation']) => void;
     refinedSearchQuery: string | null;
@@ -51,7 +51,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     // Hard-code useFullText to false instead of getting it from modelConfig
     const useFullText = false;
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
-    const [thinking, setThinking] = useState<string | null>(null);
+    const [thinking, setThinking] = useState<string[] | null>(null);
     const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
     const [refinedSearchQuery, setRefinedSearchQuery] = useState<string | null>(null);
     const [searchPrompt, setSearchPrompt] = useState<string | null>(null);
@@ -148,8 +148,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setDetails(data.knowledge_source_details);
             console.log("Knowledge source details:", data.knowledge_source_details);
 
-            // Store the thinking content
-            setThinking(data.thinking || null);
+            // Store the thinking content as an array
+            setThinking(Array.isArray(data.thinking) ? data.thinking : null);
             console.log("Thinking content:", data.thinking);
 
             // Store the bias evaluation results

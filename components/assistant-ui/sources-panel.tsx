@@ -326,13 +326,15 @@ export const SourcesPanel: FC = () => {
                 {hasContent ? (
                     <div>
                         {/* Thinking section first */}
-                        {thinking && (
+                        {thinking && thinking.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Thinking Process</h3>
                                 <p className="text-xs text-slate-500 mb-3">
                                     This shows the AI&apos;s reasoning process and how it arrived at its response.
                                 </p>
-                                <ThinkingPanel content={thinking} />
+                                {thinking.map((thinkingContent, index) => (
+                                    <ThinkingPanel key={index} content={thinkingContent} />
+                                ))}
                             </div>
                         )}
 
