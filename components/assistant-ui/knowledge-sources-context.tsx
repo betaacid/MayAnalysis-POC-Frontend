@@ -11,7 +11,7 @@ export type KnowledgeSource =
     | "apartments"
     | "labs"
     | "rent_roll"
-    | "offering_memorandum"
+    | "offering_memo"
     | "financial_analysis"
     | "web_search";
 

@@ -11,19 +11,29 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 
-// Define a mapping for display names
-const sourceDisplayNames: Record<KnowledgeSource, string> = {
+// Constants
+const SOURCE_LABELS: Record<KnowledgeSource, string> = {
     all: "All Sources",
     property_info: "Property Info",
     zillow: "Zillow",
     corelogic: "CoreLogic",
-    apartments: "Apartments",
-    labs: "Labs",
+    apartments: "Apartments.com",
+    labs: "Labs Internal",
     rent_roll: "Rent Roll",
-    offering_memorandum: "Offering Memorandum",
+    offering_memo: "Offering Memorandum",
     financial_analysis: "Financial Analysis",
-    web_search: "Web Search"
+    web_search: "Web Search",
 };
+
+// Default set of knowledge sources (all except web_search)
+export const DEFAULT_KNOWLEDGE_SOURCES: KnowledgeSource[] = [
+    "zillow",
+    "corelogic",
+    "labs",
+    "rent_roll",
+    "offering_memo",
+    "financial_analysis",
+];
 
 // All available sources (excluding web_search as requested)
 const availableSources: KnowledgeSource[] = [
@@ -34,7 +44,7 @@ const availableSources: KnowledgeSource[] = [
     "apartments",
     "labs",
     "rent_roll",
-    "offering_memorandum",
+    "offering_memo",
     "financial_analysis"
 ];
 
@@ -92,7 +102,7 @@ export const KnowledgeSourcesSelector: FC = () => {
                                         <Check className="h-3 w-3" />
                                     )}
                                 </div>
-                                <span>{sourceDisplayNames[source]}</span>
+                                <span>{SOURCE_LABELS[source]}</span>
                             </div>
                         ))}
                     </div>
@@ -129,7 +139,7 @@ export const SelectedSourcesBadges: FC = () => {
         <div className="flex flex-wrap gap-1">
             {selectedSources.map(source => (
                 <Badge key={source} variant="secondary" className="mr-1">
-                    {sourceDisplayNames[source]}
+                    {SOURCE_LABELS[source]}
                 </Badge>
             ))}
         </div>

@@ -87,7 +87,7 @@ const ThreadWelcome: FC = () => {
         <div className="flex w-full flex-grow flex-col items-center justify-center">
           <h3 className="text-xl font-semibold text-primary mb-2">MayAnalysis Property Assistant</h3>
           <div className="text-sm text-muted-foreground text-center max-w-md mb-4">
-            <p>This demo uses mocked data for the fictional Oakwood Apartments, a 48-unit multi-family property in San Francisco&apos;s Financial District.</p>
+            <p>This demo uses mocked data for <a href="https://dmvmultifamily.com/wp-content/uploads/2023/09/Spring-Valley-Apartments-OM-Compressed.pdf" target="_blank" rel="noopener noreferrer">Spring Valley Apartments</a>, a 28-unit student housing property in Washington, D.C.</p>
             <p className="mt-2">Ask questions about the property&apos;s financials, market trends, or investment potential using the knowledge sources below.</p>
           </div>
         </div>

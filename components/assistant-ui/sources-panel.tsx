@@ -5,6 +5,7 @@ import { BookOpen, FileText, XIcon, Globe, Database, Home, Building, ChevronDown
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { useKnowledgeSourceDetails } from "@/app/MyRuntimeProvider";
 import { KnowledgeSourceDetail } from "@/lib/types/knowledge-source";
+import { KnowledgeSource } from "./knowledge-sources-context";
 
 // Create a context for the sources panel
 interface SourcesPanelContextType {
@@ -33,7 +34,7 @@ const sourceIconMap: Record<string, React.ReactNode> = {
     apartments: <Building size={16} />,
     labs: <Database size={16} />,
     rent_roll: <FileText size={16} />,
-    offering_memorandum: <BookOpen size={16} />,
+    offering_memo: <BookOpen size={16} />,
     financial_analysis: <FileText size={16} />,
     web_search: <Globe size={16} />,
     property_info: <Home size={16} />,
@@ -178,35 +179,103 @@ interface SourceItemProps {
 
 const SourceItem: FC<SourceItemProps> = ({ source }) => {
     const [expanded, setExpanded] = useState(true);
+    const [showFullTextModal, setShowFullTextModal] = useState(false);
 
     // Get the appropriate icon or use default
     const icon = sourceIconMap[source.source_enum] || sourceIconMap.default;
 
+    // Check if this is an offering memorandum
+    const isOfferingMemorandum = source.source_enum === 'offering_memo' as KnowledgeSource;
+
+    // Get display content - truncate offering memorandum to 200 chars
+    const displayContent = () => {
+        if (isOfferingMemorandum) {
+            return source.text.length > 200
+                ? source.text.substring(0, 200) + '...'
+                : source.text;
+        }
+        return source.text;
+    };
+
     return (
-        <div className="border rounded-lg overflow-hidden mb-4 shadow-sm">
-            {/* Header with icon, name, and expand/collapse button */}
-            <div
-                className="flex items-center justify-between p-3 bg-slate-50 cursor-pointer"
-                onClick={() => setExpanded(!expanded)}
-            >
-                <div className="flex items-center gap-2">
-                    <span className="text-slate-600">{icon}</span>
-                    <h3 className="font-medium text-sm">{source.display_name}</h3>
+        <>
+            <div className="border rounded-lg overflow-hidden mb-4 shadow-sm">
+                {/* Header with icon, name, and expand/collapse button */}
+                <div
+                    className="flex items-center justify-between p-3 bg-slate-50 cursor-pointer"
+                    onClick={() => setExpanded(!expanded)}
+                >
+                    <div className="flex items-center gap-2">
+                        <span className="text-slate-600">{icon}</span>
+                        <h3 className="font-medium text-sm">{source.display_name}</h3>
+                    </div>
+                    <button className="text-slate-500 hover:text-slate-700">
+                        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
                 </div>
-                <button className="text-slate-500 hover:text-slate-700">
-                    {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
+
+                {/* Content area - collapsible */}
+                {expanded && (
+                    <div className="p-3 text-sm border-t bg-white">
+                        <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">
+                            {displayContent()}
+                        </div>
+
+                        {/* Show Full Text button for offering memorandum */}
+                        {isOfferingMemorandum && source.text.length > 200 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowFullTextModal(true);
+                                }}
+                                className="mt-2 px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors font-medium flex items-center"
+                            >
+                                <BookOpen size={14} className="mr-1" />
+                                View All Snippets
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Content area - collapsible */}
-            {expanded && (
-                <div className="p-3 text-sm border-t bg-white">
-                    <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">
-                        {source.text}
+            {/* Full text modal */}
+            {showFullTextModal && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex justify-center items-start overflow-y-auto p-4">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
+                        {/* Modal header */}
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <div className="flex items-center">
+                                <BookOpen size={20} className="text-slate-600 mr-2" />
+                                <h2 className="text-xl font-semibold">{source.display_name}</h2>
+                            </div>
+                            <button
+                                onClick={() => setShowFullTextModal(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <XIcon size={20} />
+                            </button>
+                        </div>
+
+                        {/* Modal content */}
+                        <div className="p-6 overflow-y-auto flex-grow">
+                            <div className="prose prose-lg max-w-none text-slate-700 whitespace-pre-wrap">
+                                {source.text}
+                            </div>
+                        </div>
+
+                        {/* Modal footer */}
+                        <div className="p-4 border-t flex justify-end">
+                            <button
+                                onClick={() => setShowFullTextModal(false)}
+                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 
