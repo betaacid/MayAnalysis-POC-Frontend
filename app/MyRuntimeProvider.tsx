@@ -28,6 +28,10 @@ interface KnowledgeSourceDetailsContextType {
     setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation']) => void;
     refinedSearchQuery: string | null;
     setRefinedSearchQuery: (refinedSearchQuery: string | null) => void;
+    originalSearchQuery: string | null;
+    setOriginalSearchQuery: (originalSearchQuery: string | null) => void;
+    searchPrompt: string | null;
+    setSearchPrompt: (searchPrompt: string | null) => void;
 }
 
 const KnowledgeSourceDetailsContext = createContext<KnowledgeSourceDetailsContextType | undefined>(undefined);
@@ -52,6 +56,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const [thinking, setThinking] = useState<string | null>(null);
     const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
     const [refinedSearchQuery, setRefinedSearchQuery] = useState<string | null>(null);
+    const [originalSearchQuery, setOriginalSearchQuery] = useState<string | null>(null);
+    const [searchPrompt, setSearchPrompt] = useState<string | null>(null);
 
     console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
@@ -157,6 +163,14 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setRefinedSearchQuery(data.refined_search_query || null);
             console.log("Refined search query:", data.refined_search_query);
 
+            // Store the original search query
+            setOriginalSearchQuery(data.original_search_query || null);
+            console.log("Original search query:", data.original_search_query);
+
+            // Store the search prompt
+            setSearchPrompt(data.search_prompt || null);
+            console.log("Search prompt:", data.search_prompt);
+
             // Format the response - only use the regular message
             const formattedContent = data.message || "Sorry, there was no response from the API.";
 
@@ -174,7 +188,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const runtime = useLocalRuntime(myModelAdapter);
 
     return (
-        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking, biasEvaluation, setBiasEvaluation, refinedSearchQuery, setRefinedSearchQuery }}>
+        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking, biasEvaluation, setBiasEvaluation, refinedSearchQuery, setRefinedSearchQuery, originalSearchQuery, setOriginalSearchQuery, searchPrompt, setSearchPrompt }}>
             <AssistantRuntimeProvider runtime={runtime}>
                 {children}
             </AssistantRuntimeProvider>

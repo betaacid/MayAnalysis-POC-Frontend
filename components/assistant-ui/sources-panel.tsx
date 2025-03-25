@@ -175,10 +175,10 @@ const ThinkingPanel: FC<ThinkingPanelProps> = ({ content }) => {
 // Component for displaying a single source
 interface SourceItemProps {
     source: KnowledgeSourceDetail;
-    refinedSearchQuery?: string;
+    searchPrompt?: string;
 }
 
-const SourceItem: FC<SourceItemProps> = ({ source, refinedSearchQuery }) => {
+const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
     const [expanded, setExpanded] = useState(true);
     const [showFullTextModal, setShowFullTextModal] = useState(false);
 
@@ -221,17 +221,21 @@ const SourceItem: FC<SourceItemProps> = ({ source, refinedSearchQuery }) => {
                 {/* Content area - collapsible */}
                 {expanded && (
                     <div className="p-3 text-sm border-t bg-white">
-                        {/* Show refined search query for web search */}
-                        {isWebSearch && refinedSearchQuery && (
+                        {/* Show query information for web search */}
+                        {isWebSearch && searchPrompt && (
                             <div className="mb-3 p-2 bg-blue-50 rounded-md border border-blue-100">
                                 <div className="flex items-center gap-1.5 text-blue-700 font-medium mb-1">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-500">
                                         <path d="M12 3L14.0357 8.16153L19.5 8.86227L15.75 12.9498L16.5714 18.4378L12 15.8462L7.42857 18.4378L8.25 12.9498L4.5 8.86227L9.96429 8.16153L12 3Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
-                                    <span>Search Query</span>
+                                    <span>Search Prompt</span>
                                 </div>
-                                <p className="text-blue-800 font-medium break-words">{refinedSearchQuery}</p>
-                                <p className="text-xs text-blue-600 mt-1 italic">This is the refined query used for web search</p>
+
+                                <div className="rounded bg-white p-2 mt-1">
+                                    <pre className="text-xs text-blue-800 whitespace-pre-wrap font-mono">{searchPrompt}</pre>
+                                </div>
+
+                                <p className="text-xs text-blue-600 mt-2 italic">This is the full prompt sent to the search service</p>
                             </div>
                         )}
                         <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">
@@ -300,7 +304,7 @@ const SourceItem: FC<SourceItemProps> = ({ source, refinedSearchQuery }) => {
 export const SourcesPanel: FC = () => {
     const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
     // Access knowledge source details and thinking through the context hook
-    const { details, thinking, biasEvaluation, refinedSearchQuery } = useKnowledgeSourceDetails();
+    const { details, thinking, biasEvaluation, searchPrompt } = useKnowledgeSourceDetails();
 
     if (!showSourcesPanel) return null;
 
@@ -349,7 +353,7 @@ export const SourcesPanel: FC = () => {
                                         <SourceItem
                                             key={`${source.source_enum}-${index}`}
                                             source={source}
-                                            refinedSearchQuery={source.source_enum === 'web_search' && refinedSearchQuery ? refinedSearchQuery : undefined}
+                                            searchPrompt={source.source_enum === 'web_search' && searchPrompt ? searchPrompt : undefined}
                                         />
                                     ))}
                                 </div>
