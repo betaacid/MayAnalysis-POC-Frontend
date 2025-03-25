@@ -8,6 +8,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { LLMConfig } from "@/components/assistant-ui/llm-config";
+import { Switch } from "@/components/ui/switch";
 
 // Define the context type for model configuration
 interface ModelConfigContextType {
@@ -21,6 +22,7 @@ interface ModelConfigContextType {
     refinementSystemPrompt: string;
     biasEvaluationModel: string;
     biasEvaluationSystemPrompt: string;
+    useFullText: boolean;
     setChatModel: (model: string) => void;
     setChatSystemPrompt: (prompt: string) => void;
     setSelectionModel: (model: string) => void;
@@ -31,6 +33,7 @@ interface ModelConfigContextType {
     setRefinementSystemPrompt: (prompt: string) => void;
     setBiasEvaluationModel: (model: string) => void;
     setBiasEvaluationSystemPrompt: (prompt: string) => void;
+    setUseFullText: (useFullText: boolean) => void;
 }
 
 // Default values for system prompts
@@ -112,6 +115,7 @@ export const ModelConfigContext = createContext<ModelConfigContextType>({
     refinementSystemPrompt: defaultRefinementSystemPrompt,
     biasEvaluationModel: "groq:llama3-70b-8192",
     biasEvaluationSystemPrompt: defaultBiasEvaluationSystemPrompt,
+    useFullText: true,
     setChatModel: () => { },
     setChatSystemPrompt: () => { },
     setSelectionModel: () => { },
@@ -122,6 +126,7 @@ export const ModelConfigContext = createContext<ModelConfigContextType>({
     setRefinementSystemPrompt: () => { },
     setBiasEvaluationModel: () => { },
     setBiasEvaluationSystemPrompt: () => { },
+    setUseFullText: () => { },
 });
 
 // Hook to use the model config context
@@ -140,6 +145,7 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [refinementSystemPrompt, setRefinementSystemPrompt] = useState(defaultRefinementSystemPrompt);
     const [biasEvaluationModel, setBiasEvaluationModel] = useState("groq:llama3-70b-8192");
     const [biasEvaluationSystemPrompt, setBiasEvaluationSystemPrompt] = useState(defaultBiasEvaluationSystemPrompt);
+    const [useFullText, setUseFullText] = useState(true); // Default to true for RAG search
 
     // Create context value object with current state and setters
     const contextValue = {
@@ -153,6 +159,7 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
         refinementSystemPrompt,
         biasEvaluationModel,
         biasEvaluationSystemPrompt,
+        useFullText,
         setChatModel,
         setChatSystemPrompt,
         setSelectionModel,
@@ -162,7 +169,8 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
         setRefinementModel,
         setRefinementSystemPrompt,
         setBiasEvaluationModel,
-        setBiasEvaluationSystemPrompt
+        setBiasEvaluationSystemPrompt,
+        setUseFullText
     };
 
     return (
@@ -222,6 +230,7 @@ export const ModelConfig: React.FC = () => {
         refinementSystemPrompt,
         biasEvaluationModel,
         biasEvaluationSystemPrompt,
+        useFullText,
         setChatModel,
         setChatSystemPrompt,
         setSelectionModel,
@@ -231,7 +240,8 @@ export const ModelConfig: React.FC = () => {
         setRefinementModel,
         setRefinementSystemPrompt,
         setBiasEvaluationModel,
-        setBiasEvaluationSystemPrompt
+        setBiasEvaluationSystemPrompt,
+        setUseFullText
     } = useModelConfig();
 
     return (
@@ -311,6 +321,34 @@ export const ModelConfig: React.FC = () => {
                             onModelChange={setBiasEvaluationModel}
                             onSystemPromptChange={setBiasEvaluationSystemPrompt}
                         />
+                    </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="rag-search-settings">
+                    <AccordionTrigger>RAG Search Settings</AccordionTrigger>
+                    <AccordionContent className="px-1">
+                        <div className="flex flex-col space-y-4 p-4 border rounded-md bg-slate-50">
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-700 mb-2">Document Retrieval</h3>
+                                <p className="text-xs text-slate-500 mb-4">
+                                    Configure how documents are retrieved and presented in responses.
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-sm font-medium">Use Full Text</div>
+                                    <p className="text-xs text-slate-500 mt-1">
+                                        When enabled, returns the entire document instead of relevant chunks.
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="use-full-text"
+                                    checked={useFullText}
+                                    onCheckedChange={setUseFullText}
+                                />
+                            </div>
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

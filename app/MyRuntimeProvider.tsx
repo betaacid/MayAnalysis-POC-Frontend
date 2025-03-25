@@ -16,7 +16,7 @@ import { createContext, useContext, useState } from "react";
 // Get API base URL from environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 // Construct the full endpoint URL
-const BACKEND_API_URL = `${API_BASE_URL}/chat/property/default/message`;
+const BACKEND_API_URL = `${API_BASE_URL}/chat/property/123/message`;
 
 // Create a context for knowledge source details
 interface KnowledgeSourceDetailsContextType {
@@ -44,6 +44,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const { includeWebSearch } = useWebSearch();
     const { selectedSources } = useKnowledgeSources();
     const modelConfig = useModelConfig();
+    const { useFullText } = modelConfig;
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
     const [thinking, setThinking] = useState<string | null>(null);
     const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
@@ -54,6 +55,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
         async run({ messages, abortSignal }) {
             console.log("Sending request to backend:", messages);
             console.log("Using model configurations:", JSON.stringify(modelConfig, null, 2));
+            console.log("Using full text:", useFullText);
 
             // Get the latest message from the user
             const latestMessage = messages[messages.length - 1];
@@ -94,6 +96,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 // Other required fields
                 knowledge_sources: knowledgeSources,
                 exclude_web: !includeWebSearch,
+                // Add the use_full_text parameter
+                use_full_text: useFullText,
             };
 
             console.log("Full API request body:", JSON.stringify(requestBody, null, 2));
