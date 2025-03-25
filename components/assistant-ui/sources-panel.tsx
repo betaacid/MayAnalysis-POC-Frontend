@@ -306,7 +306,7 @@ export const SourcesPanel: FC = () => {
     const hasContent = (thinking != null) || (details && details.length > 0) || (biasEvaluation != null);
 
     return (
-        <div className="fixed right-0 top-0 bottom-0 w-96 border-l bg-white shadow-md z-20 flex flex-col">
+        <div className="fixed right-0 top-0 bottom-0 w-[28rem] border-l bg-white shadow-md z-20 flex flex-col">
             {/* Panel Header */}
             <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
                 <div className="flex items-center gap-2">
