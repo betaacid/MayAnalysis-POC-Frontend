@@ -26,6 +26,8 @@ interface KnowledgeSourceDetailsContextType {
     setThinking: (thinking: string | null) => void;
     biasEvaluation: ChatApiResponse['bias_evaluation'];
     setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation']) => void;
+    refinedSearchQuery: string | null;
+    setRefinedSearchQuery: (refinedSearchQuery: string | null) => void;
 }
 
 const KnowledgeSourceDetailsContext = createContext<KnowledgeSourceDetailsContextType | undefined>(undefined);
@@ -49,6 +51,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
     const [thinking, setThinking] = useState<string | null>(null);
     const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
+    const [refinedSearchQuery, setRefinedSearchQuery] = useState<string | null>(null);
 
     console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
@@ -150,6 +153,10 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setBiasEvaluation(data.bias_evaluation || null);
             console.log("Bias evaluation:", data.bias_evaluation);
 
+            // Store the refined search query
+            setRefinedSearchQuery(data.refined_search_query || null);
+            console.log("Refined search query:", data.refined_search_query);
+
             // Format the response - only use the regular message
             const formattedContent = data.message || "Sorry, there was no response from the API.";
 
@@ -167,7 +174,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const runtime = useLocalRuntime(myModelAdapter);
 
     return (
-        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking, biasEvaluation, setBiasEvaluation }}>
+        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking, biasEvaluation, setBiasEvaluation, refinedSearchQuery, setRefinedSearchQuery }}>
             <AssistantRuntimeProvider runtime={runtime}>
                 {children}
             </AssistantRuntimeProvider>

@@ -41,4 +41,5 @@ export interface ChatApiResponse {
       location: string;
     }>;
   } | null;
+  refined_search_query?: string;
 }
