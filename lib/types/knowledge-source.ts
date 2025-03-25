@@ -30,7 +30,7 @@ export interface ChatApiResponse {
     is_user: boolean;
   }>;
   knowledge_source_details: KnowledgeSourceDetail[] | null;
-  thinking?: string;
+  thinking?: string[] | null;
   bias_evaluation?: {
     bias_likelihood: 'low' | 'medium' | 'high' | 'unknown';
     explanation: string;
