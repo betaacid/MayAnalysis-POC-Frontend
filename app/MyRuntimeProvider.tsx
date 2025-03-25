@@ -44,7 +44,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const { includeWebSearch } = useWebSearch();
     const { selectedSources } = useKnowledgeSources();
     const modelConfig = useModelConfig();
-    const { useFullText } = modelConfig;
+    // Hard-code useFullText to false instead of getting it from modelConfig
+    const useFullText = false;
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
     const [thinking, setThinking] = useState<string | null>(null);
     const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
