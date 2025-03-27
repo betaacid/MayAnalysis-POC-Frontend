@@ -22,10 +22,12 @@ const BACKEND_API_URL = `${API_BASE_URL}/chat/property/123/message`;
 interface KnowledgeSourceDetailsContextType {
     details: KnowledgeSourceDetail[] | null;
     setDetails: (details: KnowledgeSourceDetail[] | null) => void;
-    thinking: string[] | null;
-    setThinking: (thinking: string[] | null) => void;
-    biasEvaluation: ChatApiResponse['bias_evaluation'];
-    setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation']) => void;
+    chat_thinking: string | null;
+    setChatThinking: (thinking: string | null) => void;
+    search_thinking: string | null;
+    setSearchThinking: (thinking: string | null) => void;
+    biasEvaluation: ChatApiResponse['bias_evaluation'] | null;
+    setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation'] | null) => void;
     refinedSearchQuery: string | null;
     setRefinedSearchQuery: (refinedSearchQuery: string | null) => void;
     searchPrompt: string | null;
@@ -51,8 +53,9 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     // Hard-code useFullText to false instead of getting it from modelConfig
     const useFullText = false;
     const [details, setDetails] = useState<KnowledgeSourceDetail[] | null>(null);
-    const [thinking, setThinking] = useState<string[] | null>(null);
-    const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation']>(null);
+    const [chat_thinking, setChatThinking] = useState<string | null>(null);
+    const [search_thinking, setSearchThinking] = useState<string | null>(null);
+    const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation'] | null>(null);
     const [refinedSearchQuery, setRefinedSearchQuery] = useState<string | null>(null);
     const [searchPrompt, setSearchPrompt] = useState<string | null>(null);
 
@@ -123,11 +126,40 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
 
             // Process the response
             const data = await result.json() as ChatApiResponse;
-            // Store the knowledge source details for later use in the Sources panel
-            setDetails(data.knowledge_source_details);
 
-            // Store the thinking content - handle both string and array cases
-            setThinking(data.thinking ? (Array.isArray(data.thinking) ? data.thinking : [data.thinking]) : null);
+            // Store the knowledge source details for later use in the Sources panel
+            setDetails(data.knowledge_source_details || null);
+
+            // Attempt to extract thinking from web_search response if needed
+            let chatThinkingContent = data.chat_thinking || null;
+            const searchThinkingContent = data.search_thinking || null;
+
+            // Check if we need to extract thinking from web_search
+            if (!chatThinkingContent && data.knowledge_source_details) {
+                // Look for web_search source
+                const webSearchSource = data.knowledge_source_details.find(
+                    source => source.source_enum === 'web_search'
+                );
+
+                // If we have a web search source with text that contains <think> tags
+                if (webSearchSource?.text) {
+                    const thinkMatch = webSearchSource.text.match(/<think>([\s\S]*?)<\/think>/);
+                    if (thinkMatch && thinkMatch[1]) {
+                        // Use this as chat_thinking if no dedicated field exists
+                        chatThinkingContent = thinkMatch[1].trim();
+                        console.log('Extracted thinking from web_search:', chatThinkingContent);
+                    }
+                }
+            }
+
+            // Store thinking fields
+            setChatThinking(chatThinkingContent);
+            setSearchThinking(searchThinkingContent);
+
+            // Log search thinking for now
+            if (searchThinkingContent) {
+                console.log('Search thinking:', searchThinkingContent);
+            }
 
             // Store the bias evaluation results
             setBiasEvaluation(data.bias_evaluation || null);
@@ -155,7 +187,20 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const runtime = useLocalRuntime(myModelAdapter);
 
     return (
-        <KnowledgeSourceDetailsContext.Provider value={{ details, setDetails, thinking, setThinking, biasEvaluation, setBiasEvaluation, refinedSearchQuery, setRefinedSearchQuery, searchPrompt, setSearchPrompt }}>
+        <KnowledgeSourceDetailsContext.Provider value={{
+            details,
+            setDetails,
+            chat_thinking,
+            setChatThinking,
+            search_thinking,
+            setSearchThinking,
+            biasEvaluation,
+            setBiasEvaluation,
+            refinedSearchQuery,
+            setRefinedSearchQuery,
+            searchPrompt,
+            setSearchPrompt
+        }}>
             <AssistantRuntimeProvider runtime={runtime}>
                 {children}
             </AssistantRuntimeProvider>

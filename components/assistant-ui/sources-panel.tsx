@@ -298,11 +298,20 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
 // The Sources Panel component
 export const SourcesPanel: FC = () => {
     const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
-    const { details, thinking, biasEvaluation, searchPrompt } = useKnowledgeSourceDetails();
+    const { details, chat_thinking, search_thinking, biasEvaluation, searchPrompt } = useKnowledgeSourceDetails();
 
     if (!showSourcesPanel) return null;
 
-    const hasContent = (thinking != null) || (details && details.length > 0) || (biasEvaluation != null);
+    // Debug logs to check what we're receiving
+    console.log('Sources Panel State:', {
+        chat_thinking,
+        search_thinking,
+        details,
+        biasEvaluation
+    });
+
+    // Check if we have any thinking content to display
+    const hasContent = Boolean(chat_thinking) || Boolean(search_thinking) || (details && details.length > 0) || biasEvaluation;
 
     return (
         <div className="fixed right-0 top-0 bottom-0 w-[28rem] border-l bg-white shadow-md z-20 flex flex-col">
@@ -325,13 +334,13 @@ export const SourcesPanel: FC = () => {
                 {hasContent ? (
                     <div>
                         {/* Thinking section first */}
-                        {thinking && thinking.length > 0 && (
+                        {chat_thinking && (
                             <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Thinking Process</h3>
                                 <p className="text-xs text-slate-500 mb-3">
                                     This shows the AI&apos;s reasoning process and how it arrived at its response.
                                 </p>
-                                <ThinkingPanel content={thinking[0]} />
+                                <ThinkingPanel content={chat_thinking} />
                             </div>
                         )}
 

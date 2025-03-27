@@ -20,17 +20,20 @@ export interface KnowledgeSourceDetail {
   text: string;
 }
 
+export interface ChatMessageHistory {
+  content: string;
+  is_user: boolean;
+}
+
 /**
  * Response from the chat API including knowledge source details
  */
 export interface ChatApiResponse {
   message: string;
-  history: Array<{
-    content: string;
-    is_user: boolean;
-  }>;
-  knowledge_source_details: KnowledgeSourceDetail[] | null;
-  thinking?: string[] | null;
+  history: ChatMessageHistory[];
+  knowledge_source_details?: KnowledgeSourceDetail[];
+  chat_thinking?: string;
+  search_thinking?: string;
   bias_evaluation?: {
     bias_likelihood: 'low' | 'medium' | 'high' | 'unknown';
     explanation: string;
@@ -40,7 +43,7 @@ export interface ChatApiResponse {
       description: string;
       location: string;
     }>;
-  } | null;
+  };
   refined_search_query?: string;
   search_prompt?: string;
 }
