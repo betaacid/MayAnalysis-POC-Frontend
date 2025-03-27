@@ -175,9 +175,10 @@ const ThinkingPanel: FC<ThinkingPanelProps> = ({ content }) => {
 interface SourceItemProps {
     source: KnowledgeSourceDetail;
     searchPrompt?: string;
+    searchThinking?: string | null;
 }
 
-const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
+const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt, searchThinking }) => {
     const [expanded, setExpanded] = useState(true);
     const [showFullTextModal, setShowFullTextModal] = useState(false);
 
@@ -220,6 +221,23 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
                 {/* Content area - collapsible */}
                 {expanded && (
                     <div className="p-3 text-sm border-t bg-white">
+                        {/* Show search thinking for web search if available */}
+                        {isWebSearch && searchThinking && (
+                            <div className="mb-4">
+                                <div className="border rounded-lg overflow-hidden mb-3 shadow-sm">
+                                    <div className="flex items-center justify-between p-3 bg-indigo-50">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-indigo-600"><BrainIcon size={16} /></span>
+                                            <h3 className="font-medium text-sm text-indigo-700">Search Thinking Process</h3>
+                                        </div>
+                                    </div>
+                                    <div className="p-3 text-sm border-t bg-white">
+                                        <MarkdownContent content={searchThinking} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Show query information for web search */}
                         {isWebSearch && searchPrompt && (
                             <div className="mb-3 p-2 bg-blue-50 rounded-md border border-blue-100">
@@ -357,6 +375,7 @@ export const SourcesPanel: FC = () => {
                                             key={`${source.source_enum}-${index}`}
                                             source={source}
                                             searchPrompt={source.source_enum === 'web_search' && searchPrompt ? searchPrompt : undefined}
+                                            searchThinking={source.source_enum === 'web_search' ? search_thinking : null}
                                         />
                                     ))}
                                 </div>

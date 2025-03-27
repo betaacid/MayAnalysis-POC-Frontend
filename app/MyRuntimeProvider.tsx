@@ -127,32 +127,42 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             // Process the response
             const data = await result.json() as ChatApiResponse;
 
-            // Store the knowledge source details for later use in the Sources panel
-            setDetails(data.knowledge_source_details || null);
-
-            // Attempt to extract thinking from web_search response if needed
+            // Variables to store the processed knowledge source details and thinking content
+            let processedDetails = data.knowledge_source_details || null;
             let chatThinkingContent = data.chat_thinking || null;
-            const searchThinkingContent = data.search_thinking || null;
+            let searchThinkingContent = data.search_thinking || null;
 
-            // Check if we need to extract thinking from web_search
-            if (!chatThinkingContent && data.knowledge_source_details) {
-                // Look for web_search source
-                const webSearchSource = data.knowledge_source_details.find(
-                    source => source.source_enum === 'web_search'
-                );
+            // Process web search sources to extract thinking if needed
+            if (processedDetails) {
+                // Create a new array to avoid mutating the original data
+                processedDetails = processedDetails.map(source => {
+                    // Only process web search sources
+                    if (source.source_enum === 'web_search' && source.text) {
+                        // Check for <think> tags
+                        const thinkMatch = source.text.match(/<think>([\s\S]*?)<\/think>/);
+                        if (thinkMatch && thinkMatch[1]) {
+                            // Extract thinking content if not already provided
+                            if (!searchThinkingContent) {
+                                searchThinkingContent = thinkMatch[1].trim();
+                                console.log('Extracted search thinking from web_search:', searchThinkingContent);
+                            }
 
-                // If we have a web search source with text that contains <think> tags
-                if (webSearchSource?.text) {
-                    const thinkMatch = webSearchSource.text.match(/<think>([\s\S]*?)<\/think>/);
-                    if (thinkMatch && thinkMatch[1]) {
-                        // Use this as chat_thinking if no dedicated field exists
-                        chatThinkingContent = thinkMatch[1].trim();
-                        console.log('Extracted thinking from web_search:', chatThinkingContent);
+                            // Remove the <think> tags from the displayed text
+                            const cleanedText = source.text.replace(/<think>[\s\S]*?<\/think>/, '').trim();
+                            return { ...source, text: cleanedText };
+                        }
                     }
-                }
+                    return source;
+                });
             }
 
-            // Store thinking fields
+            // If we have search thinking but not chat thinking, use search thinking for chat
+            if (!chatThinkingContent && searchThinkingContent) {
+                chatThinkingContent = searchThinkingContent;
+            }
+
+            // Store the processed data
+            setDetails(processedDetails);
             setChatThinking(chatThinkingContent);
             setSearchThinking(searchThinkingContent);
 
