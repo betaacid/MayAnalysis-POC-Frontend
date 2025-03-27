@@ -148,8 +148,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setDetails(data.knowledge_source_details);
             console.log("Knowledge source details:", data.knowledge_source_details);
 
-            // Store the thinking content as an array
-            setThinking(Array.isArray(data.thinking) ? data.thinking : null);
+            // Store the thinking content - handle both string and array cases
+            setThinking(data.thinking ? (Array.isArray(data.thinking) ? data.thinking : [data.thinking]) : null);
             console.log("Thinking content:", data.thinking);
 
             // Store the bias evaluation results

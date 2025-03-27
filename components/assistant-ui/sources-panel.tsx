@@ -298,7 +298,6 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt }) => {
 // The Sources Panel component
 export const SourcesPanel: FC = () => {
     const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
-    // Access knowledge source details and thinking through the context hook
     const { details, thinking, biasEvaluation, searchPrompt } = useKnowledgeSourceDetails();
 
     if (!showSourcesPanel) return null;
@@ -332,9 +331,7 @@ export const SourcesPanel: FC = () => {
                                 <p className="text-xs text-slate-500 mb-3">
                                     This shows the AI&apos;s reasoning process and how it arrived at its response.
                                 </p>
-                                {thinking.map((thinkingContent, index) => (
-                                    <ThinkingPanel key={index} content={thinkingContent} />
-                                ))}
+                                <ThinkingPanel content={thinking[0]} />
                             </div>
                         )}
 
