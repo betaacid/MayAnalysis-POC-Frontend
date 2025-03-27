@@ -56,13 +56,10 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const [refinedSearchQuery, setRefinedSearchQuery] = useState<string | null>(null);
     const [searchPrompt, setSearchPrompt] = useState<string | null>(null);
 
-    console.log("[MyRuntimeProvider] Initialized with model config:", modelConfig);
 
     const myModelAdapter: ChatModelAdapter = {
         async run({ messages, abortSignal }) {
-            console.log("Sending request to backend:", messages);
-            console.log("Using model configurations:", JSON.stringify(modelConfig, null, 2));
-            console.log("Using full text:", useFullText);
+
 
             // Get the latest message from the user
             const latestMessage = messages[messages.length - 1];
@@ -107,20 +104,6 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 use_full_text: useFullText,
             };
 
-            console.log("Full API request body:", JSON.stringify(requestBody, null, 2));
-
-            // Console.log specific fields to help with debugging
-            console.log("Chat model:", requestBody.chat_model);
-            console.log("Chat system prompt:", requestBody.chat_system_prompt);
-            console.log("Selection model:", requestBody.selection_model);
-            console.log("Selection system prompt:", requestBody.selection_system_prompt);
-            console.log("Search model:", requestBody.search_model);
-            console.log("Search system prompt:", requestBody.search_system_prompt);
-            console.log("Refinement model:", requestBody.refinement_model);
-            console.log("Refinement system prompt:", requestBody.refinement_system_prompt);
-            console.log("Bias evaluation model:", requestBody.bias_evaluation_model);
-            console.log("Bias evaluation system prompt:", requestBody.bias_evaluation_system_prompt);
-
             // Call the actual backend endpoint
             const result = await fetch(BACKEND_API_URL, {
                 method: "POST",
@@ -132,8 +115,6 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 signal: abortSignal,
             });
 
-            console.log("API response status:", result.status);
-
             if (!result.ok) {
                 const errorText = await result.text().catch(() => "Unknown error");
                 console.error("API request failed:", errorText);
@@ -142,27 +123,20 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
 
             // Process the response
             const data = await result.json() as ChatApiResponse;
-            console.log("API response data:", data);
-
             // Store the knowledge source details for later use in the Sources panel
             setDetails(data.knowledge_source_details);
-            console.log("Knowledge source details:", data.knowledge_source_details);
 
             // Store the thinking content - handle both string and array cases
             setThinking(data.thinking ? (Array.isArray(data.thinking) ? data.thinking : [data.thinking]) : null);
-            console.log("Thinking content:", data.thinking);
 
             // Store the bias evaluation results
             setBiasEvaluation(data.bias_evaluation || null);
-            console.log("Bias evaluation:", data.bias_evaluation);
 
             // Store the refined search query
             setRefinedSearchQuery(data.refined_search_query || null);
-            console.log("Refined search query:", data.refined_search_query);
 
             // Store the search prompt
             setSearchPrompt(data.search_prompt || null);
-            console.log("Search prompt:", data.search_prompt);
 
             // Format the response - only use the regular message
             const formattedContent = data.message || "Sorry, there was no response from the API.";
