@@ -154,7 +154,7 @@ const ThinkingPanel: FC<ThinkingPanelProps> = ({ content }) => {
             >
                 <div className="flex items-center gap-2">
                     <span className="text-indigo-600"><BrainIcon size={16} /></span>
-                    <h3 className="font-medium text-sm text-indigo-700">Thinking Process</h3>
+                    <h3 className="font-medium text-sm text-indigo-700">Chat Thinking Process</h3>
                 </div>
                 <button className="text-indigo-500 hover:text-indigo-700">
                     {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -221,23 +221,6 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt, searchThinking 
                 {/* Content area - collapsible */}
                 {expanded && (
                     <div className="p-3 text-sm border-t bg-white">
-                        {/* Show search thinking for web search if available */}
-                        {isWebSearch && searchThinking && (
-                            <div className="mb-4">
-                                <div className="border rounded-lg overflow-hidden mb-3 shadow-sm">
-                                    <div className="flex items-center justify-between p-3 bg-indigo-50">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-indigo-600"><BrainIcon size={16} /></span>
-                                            <h3 className="font-medium text-sm text-indigo-700">Search Thinking Process</h3>
-                                        </div>
-                                    </div>
-                                    <div className="p-3 text-sm border-t bg-white">
-                                        <MarkdownContent content={searchThinking} />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
                         {/* Show query information for web search */}
                         {isWebSearch && searchPrompt && (
                             <div className="mb-3 p-2 bg-blue-50 rounded-md border border-blue-100">
@@ -255,7 +238,44 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt, searchThinking 
                                 <p className="text-xs text-blue-600 mt-2 italic">This is the full prompt sent to the search service</p>
                             </div>
                         )}
-                        <MarkdownContent content={displayContent()} />
+
+                        {/* Add header for search results section */}
+                        {isWebSearch && (
+                            <div className="mb-3 p-2 bg-emerald-50 rounded-md border border-emerald-100">
+                                <div className="flex items-center gap-1.5 text-emerald-700 font-medium mb-1">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-emerald-500">
+                                        <path d="M21 11.5C21 16.1944 17.1944 20 12.5 20C7.80558 20 4 16.1944 4 11.5C4 6.80558 7.80558 3 12.5 3C17.1944 3 21 6.80558 21 11.5Z" stroke="currentColor" strokeWidth="2" />
+                                        <path d="M15.5 11.5L19 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                    <span>Search Results</span>
+                                </div>
+                                <div className="bg-white rounded p-3 border border-emerald-100">
+                                    <MarkdownContent content={displayContent()} />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Show search thinking for web search if available - moved below search results */}
+                        {isWebSearch && searchThinking && (
+                            <div className="mb-4">
+                                <div className="border rounded-lg overflow-hidden mb-3 shadow-sm">
+                                    <div className="flex items-center justify-between p-3 bg-indigo-50">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-indigo-600"><BrainIcon size={16} /></span>
+                                            <h3 className="font-medium text-sm text-indigo-700">Search Thinking Process</h3>
+                                        </div>
+                                    </div>
+                                    <div className="p-3 text-sm border-t bg-white">
+                                        <MarkdownContent content={searchThinking} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Show content for non-web search sources */}
+                        {!isWebSearch && (
+                            <MarkdownContent content={displayContent()} />
+                        )}
 
                         {/* Show Full Text button for offering memorandum */}
                         {isOfferingMemorandum && source.text.length > 200 && (
@@ -354,7 +374,6 @@ export const SourcesPanel: FC = () => {
                         {/* Thinking section first */}
                         {chat_thinking && (
                             <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-slate-700 mb-2">Thinking Process</h3>
                                 <p className="text-xs text-slate-500 mb-3">
                                     This shows the AI&apos;s reasoning process and how it arrived at its response.
                                 </p>
