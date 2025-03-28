@@ -129,7 +129,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
 
             // Variables to store the processed knowledge source details and thinking content
             let processedDetails = data.knowledge_source_details || null;
-            let chatThinkingContent = data.chat_thinking || null;
+            const chatThinkingContent = data.chat_thinking || null;
             let searchThinkingContent = data.search_thinking || null;
 
             // Process web search sources to extract thinking if needed
@@ -154,11 +154,6 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                     }
                     return source;
                 });
-            }
-
-            // If we have search thinking but not chat thinking, use search thinking for chat
-            if (!chatThinkingContent && searchThinkingContent) {
-                chatThinkingContent = searchThinkingContent;
             }
 
             // Store the processed data
