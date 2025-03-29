@@ -405,7 +405,7 @@ export const ModelConfig: React.FC = () => {
                     <AccordionContent className="px-1">
                         <LLMConfig
                             title=""
-                            explanation="Used to evaluate if user queries should proceed based on content safety guidelines."
+                            explanation="Used to evaluate if user queries comply with real estate regulations and professional ethical standards, including Fair Housing Act compliance."
                             defaultModel={guardrailsModel}
                             defaultSystemPrompt={guardrailsSystemPrompt}
                             modelOptions={selectionModelOptions}
