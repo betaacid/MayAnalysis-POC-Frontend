@@ -44,6 +44,10 @@ export interface ChatApiResponse {
       location: string;
     }>;
   };
+  guardrails_evaluation?: {
+    should_proceed: boolean;
+    reason: string;
+  };
   refined_search_query?: string;
   search_prompt?: string;
 }

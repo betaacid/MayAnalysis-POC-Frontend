@@ -28,6 +28,8 @@ interface KnowledgeSourceDetailsContextType {
     setSearchThinking: (thinking: string | null) => void;
     biasEvaluation: ChatApiResponse['bias_evaluation'] | null;
     setBiasEvaluation: (biasEvaluation: ChatApiResponse['bias_evaluation'] | null) => void;
+    guardrailsEvaluation: ChatApiResponse['guardrails_evaluation'] | null;
+    setGuardrailsEvaluation: (guardrailsEvaluation: ChatApiResponse['guardrails_evaluation'] | null) => void;
     refinedSearchQuery: string | null;
     setRefinedSearchQuery: (refinedSearchQuery: string | null) => void;
     searchPrompt: string | null;
@@ -56,6 +58,7 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
     const [chat_thinking, setChatThinking] = useState<string | null>(null);
     const [search_thinking, setSearchThinking] = useState<string | null>(null);
     const [biasEvaluation, setBiasEvaluation] = useState<ChatApiResponse['bias_evaluation'] | null>(null);
+    const [guardrailsEvaluation, setGuardrailsEvaluation] = useState<ChatApiResponse['guardrails_evaluation'] | null>(null);
     const [refinedSearchQuery, setRefinedSearchQuery] = useState<string | null>(null);
     const [searchPrompt, setSearchPrompt] = useState<string | null>(null);
 
@@ -100,6 +103,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
                 refinement_system_prompt: modelConfig.refinementSystemPrompt,
                 bias_evaluation_model: modelConfig.biasEvaluationModel,
                 bias_evaluation_system_prompt: modelConfig.biasEvaluationSystemPrompt,
+                guardrails_model: modelConfig.guardrailsModel,
+                guardrails_system_prompt: modelConfig.guardrailsSystemPrompt,
                 // Other required fields
                 knowledge_sources: knowledgeSources,
                 exclude_web: !includeWebSearch,
@@ -169,6 +174,9 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             // Store the bias evaluation results
             setBiasEvaluation(data.bias_evaluation || null);
 
+            // Store the guardrails evaluation results
+            setGuardrailsEvaluation(data.guardrails_evaluation || null);
+
             // Store the refined search query
             setRefinedSearchQuery(data.refined_search_query || null);
 
@@ -201,6 +209,8 @@ export function MyRuntimeProvider({ children }: { children: ReactNode }) {
             setSearchThinking,
             biasEvaluation,
             setBiasEvaluation,
+            guardrailsEvaluation,
+            setGuardrailsEvaluation,
             refinedSearchQuery,
             setRefinedSearchQuery,
             searchPrompt,

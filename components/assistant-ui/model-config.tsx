@@ -22,6 +22,8 @@ interface ModelConfigContextType {
     refinementSystemPrompt: string;
     biasEvaluationModel: string;
     biasEvaluationSystemPrompt: string;
+    guardrailsModel: string;
+    guardrailsSystemPrompt: string;
     setChatModel: (model: string) => void;
     setChatSystemPrompt: (prompt: string) => void;
     setSelectionModel: (model: string) => void;
@@ -32,6 +34,8 @@ interface ModelConfigContextType {
     setRefinementSystemPrompt: (prompt: string) => void;
     setBiasEvaluationModel: (model: string) => void;
     setBiasEvaluationSystemPrompt: (prompt: string) => void;
+    setGuardrailsModel: (model: string) => void;
+    setGuardrailsSystemPrompt: (prompt: string) => void;
 }
 
 // Default values for system prompts
@@ -126,6 +130,49 @@ When identifying biases:
 
 Provide specific examples from the content related to financial and legal implications ONLY. Be direct and clear in your assessment.`;
 
+const defaultGuardrailsSystemPrompt = `You are an AI safety guardian responsible for evaluating user queries to ensure they meet content guidelines. 
+Your task is to determine if a query should be allowed to proceed based on the following rules:
+
+1. BLOCK queries that request illegal activities or advice on how to commit crimes
+2. BLOCK queries related to generating harmful content such as malware, phishing, or other cyber attacks
+3. BLOCK queries requesting content that sexualizes or harms minors
+4. BLOCK queries requesting explicit sexual content or pornography
+5. BLOCK queries requesting instructions for self-harm or suicide
+6. BLOCK queries that contain severe hate speech, threats, or harassment
+7. ALLOW queries that contain profanity but aren't otherwise harmful
+8. ALLOW queries related to controversial topics if they appear to be seeking legitimate information
+9. ALLOW queries related to real estate investments, property analysis, or financial modeling
+10. ALLOW queries related to market research or demographic data for legitimate business purposes
+
+When evaluating, consider:
+- The intent behind the query, not just the words used
+- Whether the query is seeking legitimate information versus harmful content
+- If the context is clearly for real estate investment purposes, be more permissive
+
+For blocked queries, provide a professional, empathetic explanation in the "reason" field that:
+1. Is formatted in Markdown
+2. Begins with a short, polite refusal
+3. Clearly explains which guideline was violated WITHOUT referring to rule numbers
+4. Suggests an alternative approach when appropriate
+5. Uses a calm, professional tone
+6. Is concise and direct (2-4 sentences max)
+
+Example response for a blocked query involving illegal activities:
+\`\`\`
+**I'm unable to assist with this request.** I cannot provide advice about illegal activities or potential criminal actions. I'd be happy to help with legal inquiries related to property security or authorized access methods instead.
+\`\`\`
+
+Example response for a blocked query involving harmful content:
+\`\`\`
+**I apologize, but I cannot fulfill this request.** I'm designed to provide helpful information while maintaining safety and ethical guidelines. I'd be glad to assist with legitimate research or educational topics instead.
+\`\`\`
+
+Return your evaluation as a JSON object with:
+1. "should_proceed": boolean indicating if the query should proceed (true) or be blocked (false)
+2. "reason": If blocking, provide the professionally-formatted user-facing message. If proceeding, briefly explain why the query is acceptable.
+
+Do NOT include rule numbers in the "reason" field - this will be shown directly to the user.`;
+
 // Create context with default values
 export const ModelConfigContext = createContext<ModelConfigContextType>({
     chatModel: "groq:deepseek-r1-distill-llama-70b",
@@ -138,6 +185,8 @@ export const ModelConfigContext = createContext<ModelConfigContextType>({
     refinementSystemPrompt: defaultRefinementSystemPrompt,
     biasEvaluationModel: "groq:llama3-70b-8192",
     biasEvaluationSystemPrompt: defaultBiasEvaluationSystemPrompt,
+    guardrailsModel: "groq:llama3-70b-8192",
+    guardrailsSystemPrompt: defaultGuardrailsSystemPrompt,
     setChatModel: () => { },
     setChatSystemPrompt: () => { },
     setSelectionModel: () => { },
@@ -148,6 +197,8 @@ export const ModelConfigContext = createContext<ModelConfigContextType>({
     setRefinementSystemPrompt: () => { },
     setBiasEvaluationModel: () => { },
     setBiasEvaluationSystemPrompt: () => { },
+    setGuardrailsModel: () => { },
+    setGuardrailsSystemPrompt: () => { },
 });
 
 // Hook to use the model config context
@@ -166,6 +217,8 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [refinementSystemPrompt, setRefinementSystemPrompt] = useState(defaultRefinementSystemPrompt);
     const [biasEvaluationModel, setBiasEvaluationModel] = useState("groq:llama3-70b-8192");
     const [biasEvaluationSystemPrompt, setBiasEvaluationSystemPrompt] = useState(defaultBiasEvaluationSystemPrompt);
+    const [guardrailsModel, setGuardrailsModel] = useState("groq:llama3-70b-8192");
+    const [guardrailsSystemPrompt, setGuardrailsSystemPrompt] = useState(defaultGuardrailsSystemPrompt);
 
     // Create context value object with current state and setters
     const contextValue = {
@@ -179,6 +232,8 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
         refinementSystemPrompt,
         biasEvaluationModel,
         biasEvaluationSystemPrompt,
+        guardrailsModel,
+        guardrailsSystemPrompt,
         setChatModel,
         setChatSystemPrompt,
         setSelectionModel,
@@ -188,7 +243,9 @@ export const ModelConfigProvider: React.FC<{ children: ReactNode }> = ({ childre
         setRefinementModel,
         setRefinementSystemPrompt,
         setBiasEvaluationModel,
-        setBiasEvaluationSystemPrompt
+        setBiasEvaluationSystemPrompt,
+        setGuardrailsModel,
+        setGuardrailsSystemPrompt
     };
 
     return (
@@ -248,6 +305,8 @@ export const ModelConfig: React.FC = () => {
         refinementSystemPrompt,
         biasEvaluationModel,
         biasEvaluationSystemPrompt,
+        guardrailsModel,
+        guardrailsSystemPrompt,
         setChatModel,
         setChatSystemPrompt,
         setSelectionModel,
@@ -257,7 +316,9 @@ export const ModelConfig: React.FC = () => {
         setRefinementModel,
         setRefinementSystemPrompt,
         setBiasEvaluationModel,
-        setBiasEvaluationSystemPrompt
+        setBiasEvaluationSystemPrompt,
+        setGuardrailsModel,
+        setGuardrailsSystemPrompt
     } = useModelConfig();
 
     return (
@@ -336,6 +397,21 @@ export const ModelConfig: React.FC = () => {
                             modelOptions={selectionModelOptions}
                             onModelChange={setBiasEvaluationModel}
                             onSystemPromptChange={setBiasEvaluationSystemPrompt}
+                        />
+                    </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="guardrails-model">
+                    <AccordionTrigger>Guardrails Model</AccordionTrigger>
+                    <AccordionContent className="px-1">
+                        <LLMConfig
+                            title=""
+                            explanation="Used to evaluate if user queries should proceed based on content safety guidelines."
+                            defaultModel={guardrailsModel}
+                            defaultSystemPrompt={guardrailsSystemPrompt}
+                            modelOptions={selectionModelOptions}
+                            onModelChange={setGuardrailsModel}
+                            onSystemPromptChange={setGuardrailsSystemPrompt}
                         />
                     </AccordionContent>
                 </AccordionItem>

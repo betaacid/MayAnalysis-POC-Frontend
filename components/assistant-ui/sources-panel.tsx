@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FC, createContext, useContext, useState } from "react";
-import { BookOpen, FileText, XIcon, Globe, Database, Home, Building, ChevronDown, ChevronUp, BrainIcon, AlertTriangle } from "lucide-react";
+import { BookOpen, FileText, XIcon, Globe, Database, Home, Building, ChevronDown, ChevronUp, BrainIcon, AlertTriangle, CheckCircle, XCircle, Shield } from "lucide-react";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { useKnowledgeSourceDetails } from "@/app/MyRuntimeProvider";
 import { KnowledgeSourceDetail } from "@/lib/types/knowledge-source";
@@ -333,10 +333,66 @@ const SourceItem: FC<SourceItemProps> = ({ source, searchPrompt, searchThinking 
     );
 };
 
+// Component for displaying the guardrails evaluation results
+interface GuardrailsPanelProps {
+    guardrailsEvaluation: {
+        should_proceed: boolean;
+        reason: string;
+    };
+}
+
+const GuardrailsPanel: React.FC<GuardrailsPanelProps> = ({ guardrailsEvaluation }) => {
+    const [expanded, setExpanded] = useState(true);
+    const { should_proceed, reason } = guardrailsEvaluation;
+
+    return (
+        <div className="border rounded-lg overflow-hidden mb-4 shadow-sm">
+            {/* Header with icon, name, and expand/collapse button */}
+            <div
+                className={`flex items-center justify-between p-3 ${should_proceed ? 'bg-green-50' : 'bg-red-50'} cursor-pointer`}
+                onClick={() => setExpanded(!expanded)}
+            >
+                <div className="flex items-center gap-2">
+                    <Shield className={`h-5 w-5 ${should_proceed ? 'text-green-500' : 'text-red-500'}`} />
+                    <h3 className="font-medium text-sm">Guardrails Check</h3>
+                </div>
+                <div className="flex items-center">
+                    <span className={`flex items-center text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full 
+                        ${should_proceed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {should_proceed ?
+                            <><CheckCircle size={14} className="mr-1" /> Allowed</> :
+                            <><XCircle size={14} className="mr-1" /> Blocked</>
+                        }
+                    </span>
+                    <button className={should_proceed ? 'text-green-500' : 'text-red-500'}>
+                        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Content area - collapsible */}
+            {expanded && (
+                <div className="p-3 text-sm border-t bg-white">
+                    <div className="prose prose-sm max-w-none text-slate-700">
+                        <MarkdownContent content={reason} />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 // The Sources Panel component
 export const SourcesPanel: FC = () => {
     const { showSourcesPanel, setShowSourcesPanel } = useSourcesPanel();
-    const { details, chat_thinking, search_thinking, biasEvaluation, searchPrompt } = useKnowledgeSourceDetails();
+    const {
+        details,
+        chat_thinking,
+        search_thinking,
+        biasEvaluation,
+        searchPrompt,
+        guardrailsEvaluation
+    } = useKnowledgeSourceDetails();
 
     if (!showSourcesPanel) return null;
 
@@ -345,11 +401,16 @@ export const SourcesPanel: FC = () => {
         chat_thinking,
         search_thinking,
         details,
-        biasEvaluation
+        biasEvaluation,
+        guardrailsEvaluation
     });
 
-    // Check if we have any thinking content to display
-    const hasContent = Boolean(chat_thinking) || Boolean(search_thinking) || (details && details.length > 0) || biasEvaluation;
+    // Check if we have any content to display
+    const hasContent = Boolean(chat_thinking) ||
+        Boolean(search_thinking) ||
+        (details && details.length > 0) ||
+        biasEvaluation ||
+        guardrailsEvaluation;
 
     return (
         <div className="fixed right-0 top-0 bottom-0 w-[28rem] border-l bg-white shadow-md z-20 flex flex-col">
@@ -409,6 +470,17 @@ export const SourcesPanel: FC = () => {
                                     This shows the AI&apos;s bias evaluation and detected biases.
                                 </p>
                                 <BiasEvaluationPanel biasEvaluation={biasEvaluation} />
+                            </div>
+                        )}
+
+                        {/* Guardrails Evaluation section */}
+                        {guardrailsEvaluation && (
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-700 mb-2">Guardrails Check</h3>
+                                <p className="text-xs text-slate-500 mb-3">
+                                    This shows the AI&apos;s guardrails evaluation and the reason for the decision.
+                                </p>
+                                <GuardrailsPanel guardrailsEvaluation={guardrailsEvaluation} />
                             </div>
                         )}
                     </div>
